@@ -1,0 +1,35 @@
+# Sistema Operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Configuración local
+config/config.php
+
+# Base de datos
+*.sql.backup
+*.db
+
+# Logs
+*.log
+error_log
+
+# Temporales
+*.tmp
+*.temp
+.cache/
+
+# Node modules (si agregas herramientas JS)
+node_modules/
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Backups
+backup/
+*.bak
