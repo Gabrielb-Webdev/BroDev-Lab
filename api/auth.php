@@ -5,7 +5,34 @@
  * Endpoint: /api/auth.php
  */
 
-require_once '../config/config.php';
+// Habilitar reporte de errores para debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // No mostrar en pantalla
+ini_set('log_errors', 1);
+
+// Capturar cualquier error fatal
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE])) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode([
+            'error' => 'Error fatal del servidor',
+            'details' => $error['message'],
+            'file' => basename($error['file']),
+            'line' => $error['line']
+        ]);
+    }
+});
+
+try {
+    require_once '../config/config.php';
+} catch (Exception $e) {
+    header('Content-Type: application/json');
+    http_response_code(500);
+    echo json_encode(['error' => 'Error al cargar configuración: ' . $e->getMessage()]);
+    exit;
+}
 
 // Iniciar sesión PHP
 session_start();
@@ -15,7 +42,7 @@ setCorsHeaders();
 try {
     $db = getDBConnection();
 } catch (PDOException $e) {
-    sendJsonResponse(['error' => 'Error de conexión a base de datos. Verifica que la instalación esté completa.'], 500);
+    sendJsonResponse(['error' => 'Error de conexión a base de datos. Verifica que la instalación esté completa.', 'details' => $e->getMessage()], 500);
     exit;
 }
 $method = $_SERVER['REQUEST_METHOD'];
@@ -256,10 +283,17 @@ function handleLogout($db) {
 // ============================================
 function verifySession($db) {
     try {
+        // Verificar que la tabla existe
+        $tableCheck = $db->query("SHOW TABLES LIKE 'user_sessions'");
+        if ($tableCheck->rowCount() === 0) {
+            sendJsonResponse(['authenticated' => false, 'error' => 'Base de datos no configurada'], 200);
+            return;
+        }
+        
         $sessionToken = $_SESSION['session_token'] ?? null;
         
         if (!$sessionToken) {
-            sendJsonResponse(['authenticated' => false], 401);
+            sendJsonResponse(['authenticated' => false], 200);
             return;
         }
         
@@ -275,7 +309,7 @@ function verifySession($db) {
         if (!$session) {
             session_unset();
             session_destroy();
-            sendJsonResponse(['authenticated' => false], 401);
+            sendJsonResponse(['authenticated' => false], 200);
             return;
         }
         
@@ -286,7 +320,7 @@ function verifySession($db) {
         ]);
         
     } catch (PDOException $e) {
-        sendJsonResponse(['error' => 'Error al verificar sesión'], 500);
+        sendJsonResponse(['authenticated' => false, 'error' => $e->getMessage()], 200);
     }
 }
 
