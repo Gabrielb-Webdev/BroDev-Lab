@@ -62,40 +62,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
         $sql = file_get_contents($sqlFile);
         $logs[] = "✓ Archivo SQL cargado (" . strlen($sql) . " bytes)";
         
-        // Dividir comandos SQL
+        // Limpiar SQL y dividir comandos
         $logs[] = "⚙️ Procesando comandos SQL...";
+        
+        // Remover comentarios y líneas vacías
+        $sql = preg_replace('/^--.*$/m', '', $sql);
+        $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
+        
+        // Dividir por punto y coma, pero mantener comandos completos
         $statements = array_filter(
             array_map('trim', explode(';', $sql)),
             function($stmt) {
-                return !empty($stmt) && 
-                       !preg_match('/^--/', $stmt) && 
-                       $stmt !== '';
+                return !empty($stmt) && strlen(trim($stmt)) > 5;
             }
         );
         
         $successCount = 0;
         $errorCount = 0;
         
-        // Ejecutar cada comando
-        foreach ($statements as $statement) {
+        // Primero: DROP de índices y vistas si existen
+        $logs[] = "🧹 Limpiando estructuras previas...";
+        $cleanupStatements = [
+            "DROP VIEW IF EXISTS project_summary",
+            "DROP TABLE IF EXISTS user_sessions",
+            "DROP TABLE IF EXISTS notifications",
+            "DROP TABLE IF EXISTS messages",
+            "DROP TABLE IF EXISTS project_activities",
+            "DROP TABLE IF EXISTS time_sessions",
+            "DROP TABLE IF EXISTS project_phases",
+            "DROP TABLE IF EXISTS projects",
+            "DROP TABLE IF EXISTS clients",
+            "DROP TABLE IF EXISTS admin_users"
+        ];
+        
+        foreach ($cleanupStatements as $stmt) {
             try {
-                if (trim($statement)) {
-                    $db->exec($statement);
-                    $successCount++;
+                $db->exec($stmt);
+            } catch (PDOException $e) {
+                // Ignorar errores de limpieza
+            }
+        }
+        $logs[] = "✓ Limpieza completada";
+        
+        // Ejecutar cada comando SQL
+        foreach ($statements as $index => $statement) {
+            if (empty(trim($statement))) continue;
+            
+            try {
+                $db->exec($statement);
+                $successCount++;
+                
+                // Log para CREATE TABLE
+                if (stripos($statement, 'CREATE TABLE') !== false) {
+                    preg_match('/CREATE TABLE.*?`?(\w+)`?\s/i', $statement, $matches);
+                    if (isset($matches[1])) {
+                        $logs[] = "✓ Tabla creada: {$matches[1]}";
+                    }
                 }
             } catch (PDOException $e) {
-                // Ignorar errores de "ya existe"
-                if (strpos($e->getMessage(), 'already exists') === false && 
-                    strpos($e->getMessage(), 'Duplicate entry') === false) {
-                    $logs[] = "⚠️ Advertencia: " . substr($e->getMessage(), 0, 100);
-                    $errorCount++;
+                // Ignorar solo errores de "ya existe"
+                if (strpos($e->getMessage(), 'already exists') !== false || 
+                    strpos($e->getMessage(), 'Duplicate') !== false) {
+                    continue;
                 }
+                $errorCount++;
+                $logs[] = "⚠️ Error en comando " . ($index + 1) . ": " . substr($e->getMessage(), 0, 120);
             }
         }
         
         $logs[] = "✓ SQL ejecutado: $successCount comandos exitosos";
         if ($errorCount > 0) {
-            $logs[] = "⚠️ Advertencias: $errorCount (pueden ser normales)";
+            $logs[] = "⚠️ Errores encontrados: $errorCount";
         }
         
         // Verificar tablas
