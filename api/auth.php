@@ -12,7 +12,12 @@ session_start();
 
 setCorsHeaders();
 
-$db = getDBConnection();
+try {
+    $db = getDBConnection();
+} catch (PDOException $e) {
+    sendJsonResponse(['error' => 'Error de conexión a base de datos. Verifica que la instalación esté completa.'], 500);
+    exit;
+}
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
@@ -74,6 +79,13 @@ function handleLogin($db) {
 
 function loginAdmin($db, $username, $password) {
     try {
+        // Verificar que la tabla existe
+        $tableCheck = $db->query("SHOW TABLES LIKE 'admin_users'");
+        if ($tableCheck->rowCount() === 0) {
+            sendJsonResponse(['error' => 'La base de datos no está configurada. Por favor ejecuta el instalador en /setup.php'], 500);
+            return;
+        }
+        
         // Buscar usuario admin por username o email
         $stmt = $db->prepare("
             SELECT id, username, email, password_hash, full_name, role, status 

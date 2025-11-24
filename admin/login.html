@@ -67,6 +67,10 @@
             margin-bottom: 8px;
         }
 
+        .password-wrapper {
+            position: relative;
+        }
+
         .form-group input {
             width: 100%;
             padding: 14px 16px;
@@ -78,10 +82,32 @@
             transition: all 0.3s ease;
         }
 
+        .password-wrapper input {
+            padding-right: 50px;
+        }
+
         .form-group input:focus {
             outline: none;
             border-color: var(--accent-primary);
             box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            color: var(--accent-primary);
         }
 
         .btn-login {
@@ -179,14 +205,19 @@
 
             <div class="form-group">
                 <label for="password">Contraseña</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    required 
-                    autocomplete="current-password"
-                    placeholder="Tu contraseña"
-                >
+                <div class="password-wrapper">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required 
+                        autocomplete="current-password"
+                        placeholder="Tu contraseña"
+                    >
+                    <button type="button" class="toggle-password" id="togglePassword" title="Mostrar contraseña">
+                        👁️
+                    </button>
+                </div>
             </div>
 
             <button type="submit" id="loginBtn" class="btn-login">
@@ -259,6 +290,22 @@
             errorMessage.classList.add('show');
         }
         
+        // Toggle para mostrar/ocultar contraseña
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = this;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+                toggleBtn.title = 'Ocultar contraseña';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+                toggleBtn.title = 'Mostrar contraseña';
+            }
+        });
+
         // Verificar si ya está autenticado
         window.addEventListener('DOMContentLoaded', async () => {
             try {
