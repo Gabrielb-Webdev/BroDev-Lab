@@ -4,15 +4,15 @@
  * BroDev Lab - Client Portal
  */
 
-// Configuración de Base de Datos
+// Configuración de Base de Datos - HOSTINGER
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'brodevlab_portal');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_NAME', 'u851317150_brodevlab');
+define('DB_USER', 'u851317150_brodevlab');
+define('DB_PASS', 'Lg030920.');
 define('DB_CHARSET', 'utf8mb4');
 
 // Configuración de la Aplicación
-define('SITE_URL', 'http://127.0.0.1:5500');
+define('SITE_URL', 'https://grey-squirrel-133805.hostingersite.com');
 define('API_URL', SITE_URL . '/api');
 
 // Configuración de Email (SendGrid/SMTP)
@@ -31,7 +31,7 @@ define('ADMIN_SESSION_LIFETIME', 7200); // 2 horas
 date_default_timezone_set('America/Mexico_City'); // Ajustar a tu zona horaria
 
 // Mostrar errores (cambiar a false en producción)
-define('DEBUG_MODE', true);
+define('DEBUG_MODE', false);
 
 if (DEBUG_MODE) {
     error_reporting(E_ALL);
