@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <rect width="100" height="100" fill="#0A0118" rx="20"/>
+  
+  <!-- Bro 1 - Purple (left) -->
+  <g id="bro1">
+    <!-- Head -->
+    <rect x="8" y="25" width="35" height="35" rx="4" fill="#7C3AED" stroke="#8B5CF6" stroke-width="2"/>
+    <!-- Eyes -->
+    <rect x="15" y="35" width="7" height="7" fill="#0A0118"/>
+    <rect x="29" y="35" width="7" height="7" fill="#0A0118"/>
+    <!-- Smile -->
+    <rect x="19" y="50" width="13" height="3" rx="1.5" fill="#0A0118"/>
+    <!-- Body -->
+    <rect x="13" y="65" width="25" height="15" rx="3" fill="#7C3AED" stroke="#8B5CF6" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Bro 2 - Pink (right) -->
+  <g id="bro2">
+    <!-- Head -->
+    <rect x="57" y="25" width="35" height="35" rx="4" fill="#EC4899" stroke="#F472B6" stroke-width="2"/>
+    <!-- Shades -->
+    <rect x="62" y="33" width="25" height="9" rx="2" fill="#0A0118" opacity="0.9"/>
+    <line x1="74.5" y1="33" x2="74.5" y2="42" stroke="#EC4899" stroke-width="1.5"/>
+    <!-- Smirk -->
+    <path d="M 66 50 Q 74.5 54 83 50" stroke="#0A0118" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- Body -->
+    <rect x="62" y="65" width="25" height="15" rx="3" fill="#EC4899" stroke="#F472B6" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Glow effect -->
+  <circle cx="25.5" cy="42.5" r="20" fill="#7C3AED" opacity="0.1" filter="blur(10)"/>
+  <circle cx="74.5" cy="42.5" r="20" fill="#EC4899" opacity="0.1" filter="blur(10)"/>
+</svg>

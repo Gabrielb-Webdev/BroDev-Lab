@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Agencia de desarrollo web profesional - Llevamos tu empresa al siguiente nivel con tecnología y estrategia">
+    <title>BroDev Lab - Desarrollo Web Profesional</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+                            <!-- Bro 1 - Purple -->
+                            <rect x="10" y="20" width="30" height="30" rx="4" fill="#7C3AED" stroke="#8B5CF6" stroke-width="2"/>
+                            <rect x="16" y="28" width="6" height="6" fill="#0A0118"/>
+                            <rect x="28" y="28" width="6" height="6" fill="#0A0118"/>
+                            <rect x="19" y="40" width="12" height="3" rx="1.5" fill="#0A0118"/>
+                            <rect x="12" y="53" width="24" height="15" rx="3" fill="#7C3AED" stroke="#8B5CF6" stroke-width="2"/>
+                            
+                            <!-- Bro 2 - Pink -->
+                            <rect x="60" y="20" width="30" height="30" rx="4" fill="#EC4899" stroke="#F472B6" stroke-width="2"/>
+                            <rect x="63" y="27" width="24" height="8" rx="2" fill="#0A0118" opacity="0.9"/>
+                            <line x1="75" y1="27" x2="75" y2="35" stroke="#EC4899" stroke-width="2"/>
+                            <path d="M 66 42 Q 75 46 84 42" stroke="#0A0118" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                            <rect x="62" y="53" width="24" height="15" rx="3" fill="#EC4899" stroke="#F472B6" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text">Bro<span class="highlight">Dev Lab</span></span>
+                </div>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html" class="nav-link active">Inicio</a></li>
+                    <li><a href="pages/services.html" class="nav-link">Servicios</a></li>
+                    <li><a href="pages/portfolio.html" class="nav-link">Portafolio</a></li>
+                    <li><a href="pages/about.html" class="nav-link">Nosotros</a></li>
+                    <li><a href="pages/contact.html" class="nav-link">Contacto</a></li>
+                </ul>
+                <a href="pages/contact.html" class="cta-button">Consulta Gratuita</a>
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+        <div class="hero-background">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="gradient-orb orb-3"></div>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text" data-scroll>
+                    <h1 class="hero-title">
+                        Llevamos tu empresa al 
+                        <span class="gradient-text">siguiente nivel</span>
+                        con tecnología y estrategia
+                    </h1>
+                    <p class="hero-subtitle">
+                        Transformamos ideas en experiencias digitales únicas con diseño y desarrollo web de vanguardia
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#contacto" class="btn btn-primary">
+                            <span>Comenzar Proyecto</span>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4 10H16M16 10L10 4M16 10L10 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </a>
+                        <a href="#portafolio" class="btn btn-secondary">Ver Portafolio</a>
+                    </div>
+                </div>
+                <div class="hero-visual" data-scroll>
+                    <div class="floating-card card-3d" data-tilt>
+                        <div class="card-glow"></div>
+                        <div class="card-content">
+                            <div class="code-preview">
+                                <div class="code-header">
+                                    <div class="dots">
+                                        <span></span><span></span><span></span>
+                                    </div>
+                                    <span class="filename">BroDevLab.tsx</span>
+                                </div>
+                                <div class="code-lines">
+                                    <code><span class="purple">import</span> { <span class="blue">useState</span>, <span class="blue">useEffect</span> } <span class="purple">from</span> <span class="green">'react'</span></code>
+                                    <code></code>
+                                    <code><span class="purple">const</span> <span class="blue">BroDevLab</span> = <span class="yellow">()</span> <span class="purple">=></span> {</code>
+                                    <code>  <span class="purple">const</span> [<span class="blue">innovation</span>, <span class="blue">setInnovation</span>] = <span class="blue">useState</span>(<span class="orange">true</span>)</code>
+                                    <code></code>
+                                    <code>  <span class="purple">return</span> <span class="yellow">(</span></code>
+                                    <code>    <span class="green">&lt;WebExperience</span></code>
+                                    <code>      <span class="blue">innovative</span>={innovation}</code>
+                                    <code>      <span class="blue">modern</span>={<span class="orange">true</span>}</code>
+                                    <code>      <span class="blue">responsive</span>={<span class="orange">true</span>}</code>
+                                    <code>      <span class="blue">quality</span>=<span class="green">"premium"</span></code>
+                                    <code>    <span class="green">/&gt;</span></code>
+                                    <code>  <span class="yellow">)</span></code>
+                                    <code>}</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item" data-scroll>
+                    <div class="stat-number" data-count="50">0</div>
+                    <div class="stat-label">Proyectos Completados</div>
+                </div>
+                <div class="stat-item" data-scroll>
+                    <div class="stat-number" data-count="30">0</div>
+                    <div class="stat-label">Clientes Satisfechos</div>
+                </div>
+                <div class="stat-item" data-scroll>
+                    <div class="stat-number" data-count="100">0</div>
+                    <div class="stat-label">% Tasa de Éxito</div>
+                </div>
+                <div class="stat-item" data-scroll>
+                    <div class="stat-number" data-count="3">0</div>
+                    <div class="stat-label">Años de Experiencia</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="servicios">
+        <div class="container">
+            <div class="section-header" data-scroll>
+                <span class="section-tag">SERVICIOS</span>
+                <h2 class="section-title">¿Qué hacemos?</h2>
+                <p class="section-subtitle">Nos especializamos en trabajar con productos digitales y marcas, en vincular tu marca a través de desarrollo web con tecnologías significativas</p>
+            </div>
+            <div class="services-grid-improved">
+                <!-- Card 1: Desarrollo Web -->
+                <div class="service-card-improved" data-scroll>
+                    <div class="service-card-inner">
+                        <div class="service-icon-wrapper">
+                            <div class="service-icon-improved">
+                                <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+                                    <rect x="6" y="10" width="36" height="28" rx="2" stroke="currentColor" stroke-width="2.5"/>
+                                    <path d="M6 16H42" stroke="currentColor" stroke-width="2.5"/>
+                                    <circle cx="12" cy="13" r="1.5" fill="currentColor"/>
+                                    <circle cx="16" cy="13" r="1.5" fill="currentColor"/>
+                                    <circle cx="20" cy="13" r="1.5" fill="currentColor"/>
+                                    <path d="M16 24L20 28L28 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <h3 class="service-title-improved">Desarrollo Web Personalizado</h3>
+                        <p class="service-description-improved">Sitios web modernos, elegantes y optimizados con funcionalidades personalizadas. Diseño responsive que se adapta perfectamente a cualquier dispositivo.</p>
+                        <ul class="service-features-improved">
+                            <li>React, Next.js, Vue.js</li>
+                            <li>Diseño UI/UX profesional</li>
+                            <li>SEO optimizado</li>
+                            <li>Performance 100/100</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Card 2: E-commerce -->
+                <div class="service-card-improved" data-scroll>
+                    <div class="service-card-inner">
+                        <div class="service-icon-wrapper">
+                            <div class="service-icon-improved">
+                                <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+                                    <rect x="8" y="12" width="32" height="24" rx="2" stroke="currentColor" stroke-width="2.5"/>
+                                    <path d="M14 20H34M14 26H28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                                    <circle cx="36" cy="32" r="8" stroke="currentColor" stroke-width="2.5" fill="none"/>
+                                    <path d="M33 32L35 34L39 30" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <h3 class="service-title-improved">E-commerce</h3>
+                        <p class="service-description-improved">Tiendas online completas y seguras que convierten visitantes en clientes. Integramos pasarelas de pago y gestión de inventario en tiempo real.</p>
+                        <ul class="service-features-improved">
+                            <li>Shopify & WooCommerce</li>
+                            <li>Pagos seguros integrados</li>
+                            <li>Panel de administración</li>
+                            <li>Marketing automation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Card 3: Branding Digital -->
+                <div class="service-card-improved" data-scroll>
+                    <div class="service-card-inner">
+                        <div class="service-icon-wrapper">
+                            <div class="service-icon-improved">
+                                <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+                                    <path d="M24 8L28 18H38L30 24L34 36L24 29L14 36L18 24L10 18H20L24 8Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" fill="none"/>
+                                    <circle cx="24" cy="24" r="4" fill="currentColor"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <h3 class="service-title-improved">Branding Digital</h3>
+                        <p class="service-description-improved">Creamos identidades visuales únicas que destacan tu marca. Desde el logo hasta la estrategia completa de comunicación digital.</p>
+                        <ul class="service-features-improved">
+                            <li>Diseño de identidad visual</li>
+                            <li>Guías de estilo</li>
+                            <li>Contenido para redes</li>
+                            <li>Estrategia de marca</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section class="portfolio" id="portafolio">
+        <div class="container">
+            <div class="section-header" data-scroll>
+                <span class="section-tag">Portafolio</span>
+                <h2 class="section-title">Nuestros Proyectos</h2>
+                <p class="section-subtitle">Casos de éxito que demuestran nuestra experiencia y compromiso con la excelencia</p>
+            </div>
+            <div class="portfolio-grid">
+                <div class="portfolio-item" data-scroll>
+                    <div class="portfolio-image">
+                        <img src="images/pixiux.png" alt="Pixiu X - HubSpot Expertise" class="project-img">
+                        <div class="project-overlay">
+                            <span class="project-type">Marketing & CRM</span>
+                            <a href="https://pixiux.com" target="_blank" rel="noopener" class="project-link">Ver Proyecto →</a>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3 class="portfolio-title">Pixiu X - HubSpot Expertise</h3>
+                        <p class="portfolio-description">Sitio web profesional para agencia especializada en HubSpot CRM. Diseño limpio y moderno enfocado en conversión y generación de leads.</p>
+                        <div class="portfolio-tags">
+                            <span class="tag">Web Design</span>
+                            <span class="tag">HubSpot</span>
+                            <span class="tag">Marketing</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-item" data-scroll>
+                    <div class="portfolio-image">
+                        <img src="images/multigamer360.png" alt="Multigamer360 - Tienda de Videojuegos" class="project-img">
+                        <div class="project-overlay">
+                            <span class="project-type">E-commerce</span>
+                            <a href="https://teal-fish-507993.hostingersite.com/productos.php?brand=nintendo&console=nes" target="_blank" rel="noopener" class="project-link">Ver Proyecto →</a>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3 class="portfolio-title">Tienda de Videojuegos</h3>
+                        <p class="portfolio-description">E-commerce completo para venta de videojuegos con sistema de filtros, carrito de compras y gestión de inventario multi-consola.</p>
+                        <div class="portfolio-tags">
+                            <span class="tag">E-commerce</span>
+                            <span class="tag">Payment Gateway</span>
+                            <span class="tag">Gaming</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-item" data-scroll>
+                    <div class="portfolio-image">
+                        <img src="images/outterfly.png" alt="Outterfly - Promoción de Videojuego" class="project-img">
+                        <div class="project-overlay">
+                            <span class="project-type">Landing Page</span>
+                            <a href="https://outterfly.netlify.app" target="_blank" rel="noopener" class="project-link">Ver Proyecto →</a>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3 class="portfolio-title">Outterfly - Promoción de Videojuego</h3>
+                        <p class="portfolio-description">Landing page inmersiva con temática espacial para promoción de videojuego. Diseño cinematográfico con animaciones y efectos visuales impactantes.</p>
+                        <div class="portfolio-tags">
+                            <span class="tag">Landing Page</span>
+                            <span class="tag">Animation</span>
+                            <span class="tag">Gaming</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="nosotros">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text" data-scroll>
+                    <span class="section-tag">Nosotros</span>
+                    <h2 class="section-title">Equipo apasionado por el código</h2>
+                    <p class="about-description">
+                        Somos un equipo de desarrolladores que creemos que cada línea de código es una oportunidad para crear algo extraordinario. Con más de 3 años de experiencia combinada, transformamos ideas en soluciones digitales que marcan la diferencia.
+                    </p>
+                    <p class="about-description">
+                        Nuestro enfoque va más allá del desarrollo técnico. Nos sumergimos en tu negocio, entendemos tus desafíos y diseñamos estrategias digitales que impulsan resultados reales. Cada proyecto es una colaboración donde tu visión se encuentra con nuestra expertise tecnológica.
+                    </p>
+                    <div class="about-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">✓</div>
+                            <div class="feature-text">
+                                <strong>Tecnologías Modernas</strong>
+                                <p>Trabajamos con el stack más actual del mercado</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">✓</div>
+                            <div class="feature-text">
+                                <strong>Entrega Puntual</strong>
+                                <p>Cumplimos plazos sin comprometer calidad</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">✓</div>
+                            <div class="feature-text">
+                                <strong>Soporte Continuo</strong>
+                                <p>Te acompañamos después del lanzamiento</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-visual" data-scroll>
+                    <div class="team-card card-3d" data-tilt>
+                        <div class="card-glow"></div>
+                        <div class="team-grid">
+                            <div class="team-member">
+                                <div class="member-avatar">
+                                    <div class="avatar-placeholder"></div>
+                                </div>
+                                <div class="member-info">
+                                    <h4>Dev #1</h4>
+                                    <p>Full Stack Developer</p>
+                                </div>
+                            </div>
+                            <div class="team-member">
+                                <div class="member-avatar">
+                                    <div class="avatar-placeholder"></div>
+                                </div>
+                                <div class="member-info">
+                                    <h4>Dev #2</h4>
+                                    <p>Frontend Specialist</p>
+                                </div>
+                            </div>
+                            <div class="team-member">
+                                <div class="member-avatar">
+                                    <div class="avatar-placeholder"></div>
+                                </div>
+                                <div class="member-info">
+                                    <h4>Dev #3</h4>
+                                    <p>UI/UX Designer</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header" data-scroll>
+                <span class="section-tag">Testimonios</span>
+                <h2 class="section-title">Lo que dicen nuestros clientes</h2>
+            </div>
+            <div class="testimonials-slider">
+                <div class="testimonial-card" data-scroll>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"Increíble trabajo. Transformaron completamente nuestra presencia online y las ventas aumentaron un 150%. Profesionales, creativos y siempre disponibles."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar"></div>
+                        <div class="author-info">
+                            <h4>María González</h4>
+                            <p>CEO, Fashion Store</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card" data-scroll>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"El equipo superó todas mis expectativas. La atención al detalle y la calidad del código son excepcionales. Definitivamente volveré a trabajar con ellos."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar"></div>
+                        <div class="author-info">
+                            <h4>Carlos Ruiz</h4>
+                            <p>Founder, Tech Startup</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card" data-scroll>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"Profesionalismo de principio a fin. Nos ayudaron a definir nuestra estrategia digital y crearon una plataforma que nuestros clientes aman."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar"></div>
+                        <div class="author-info">
+                            <h4>Ana Martínez</h4>
+                            <p>Director, Agency Digital</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contacto">
+        <div class="container">
+            <div class="contact-wrapper">
+                <div class="contact-info" data-scroll>
+                    <span class="section-tag">Contacto</span>
+                    <h2 class="section-title">¿Listo para comenzar?</h2>
+                    <p class="contact-description">
+                        Completa el formulario y nos pondremos en contacto contigo en menos de 24 horas para discutir tu proyecto y cómo podemos ayudarte.
+                    </p>
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M3 8L10.89 13.26C11.2187 13.4793 11.6049 13.5963 12 13.5963C12.3951 13.5963 12.7813 13.4793 13.11 13.26L21 8M5 19H19C19.5304 19 20.0391 18.7893 20.4142 18.4142C20.7893 18.0391 21 17.5304 21 17V7C21 6.46957 20.7893 5.96086 20.4142 5.58579C20.0391 5.21071 19.5304 5 19 5H5C4.46957 5 3.96086 5.21071 3.58579 5.58579C3.21071 5.96086 3 6.46957 3 7V17C3 17.5304 3.21071 18.0391 3.58579 18.4142C3.96086 18.7893 4.46957 19 5 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="contact-text">
+                                <strong>Email</strong>
+                                <p>contacto@brodevlab.com</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div class="contact-text">
+                                <strong>Ubicación</strong>
+                                <p>Trabajamos remoto - Disponibles globalmente</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <form class="contact-form" id="contactForm" data-scroll>
+                    <div class="form-group">
+                        <label for="name">Nombre completo *</label>
+                        <input type="text" id="name" name="name" required placeholder="Tu nombre">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" required placeholder="tu@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="company">Empresa</label>
+                        <input type="text" id="company" name="company" placeholder="Nombre de tu empresa">
+                    </div>
+                    <div class="form-group">
+                        <label for="service">Servicio de interés *</label>
+                        <select id="service" name="service" required>
+                            <option value="">Selecciona un servicio</option>
+                            <option value="web">Desarrollo Web</option>
+                            <option value="ecommerce">E-commerce</option>
+                            <option value="branding">Branding Digital</option>
+                            <option value="consulting">Consultoría IT</option>
+                            <option value="other">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="message">Cuéntanos sobre tu proyecto *</label>
+                        <textarea id="message" name="message" required rows="5" placeholder="Describe tu proyecto y objetivos..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-submit">
+                        <span>Enviar Mensaje</span>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M4 10H16M16 10L10 4M16 10L10 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <p class="form-privacy">Al enviar este formulario aceptas nuestra política de privacidad</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 50" fill="none">
+                                <!-- Bro 1 - Purple -->
+                                <rect x="2" y="5" width="20" height="20" rx="2" fill="#7C3AED" stroke="#8B5CF6" stroke-width="1"/>
+                                <rect x="6" y="10" width="4" height="4" fill="#0A0118"/>
+                                <rect x="14" y="10" width="4" height="4" fill="#0A0118"/>
+                                <rect x="8" y="18" width="8" height="2" rx="1" fill="#0A0118"/>
+                                <rect x="5" y="28" width="14" height="10" rx="2" fill="#7C3AED" stroke="#8B5CF6" stroke-width="1"/>
+                                
+                                <!-- Bro 2 - Pink -->
+                                <rect x="28" y="5" width="20" height="20" rx="2" fill="#EC4899" stroke="#F472B6" stroke-width="1"/>
+                                <rect x="30" y="9" width="16" height="5" rx="1" fill="#0A0118" opacity="0.9"/>
+                                <line x1="38" y1="9" x2="38" y2="14" stroke="#EC4899" stroke-width="1"/>
+                                <path d="M 33 18 Q 38 20 43 18" stroke="#0A0118" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                                <rect x="31" y="28" width="14" height="10" rx="2" fill="#EC4899" stroke="#F472B6" stroke-width="1"/>
+                            </svg>
+                        </div>
+                        <span class="logo-text">Bro<span class="highlight">Dev Lab</span></span>
+                    </div>
+                    <p class="footer-tagline">Transformando ideas en realidad digital</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Navegación</h4>
+                        <ul>
+                            <li><a href="#inicio">Inicio</a></li>
+                            <li><a href="#servicios">Servicios</a></li>
+                            <li><a href="#portafolio">Portafolio</a></li>
+                            <li><a href="#nosotros">Nosotros</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Servicios</h4>
+                        <ul>
+                            <li><a href="#servicios">Desarrollo Web</a></li>
+                            <li><a href="#servicios">E-commerce</a></li>
+                            <li><a href="#servicios">Branding</a></li>
+                            <li><a href="#servicios">Consultoría</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024-2025 BroDev Lab. Todos los derechos reservados.</p>
+                <div class="footer-legal">
+                    <a href="pages/privacy-policy.html">Política de Privacidad</a>
+                    <span>•</span>
+                    <a href="pages/terms-of-service.html">Términos de Servicio</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
