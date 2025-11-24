@@ -5,6 +5,8 @@
  */
 
 require_once '../config/config.php';
+require_once '../config/auth-middleware.php';
+
 setCorsHeaders();
 
 $db = getDBConnection();
@@ -16,26 +18,34 @@ switch ($method) {
         if (isset($_GET['id'])) {
             getProjectById($db, $_GET['id']);
         } elseif (isset($_GET['access_code'])) {
+            // Access code es público para clientes
             getProjectByAccessCode($db, $_GET['access_code']);
         } elseif (isset($_GET['client_id'])) {
+            // Requiere autenticación
+            requireAuth();
             getProjectsByClient($db, $_GET['client_id']);
         } else {
+            // Requiere ser admin para ver todos los proyectos
+            requireAdmin();
             getAllProjects($db);
         }
         break;
         
     case 'POST':
-        // Crear nuevo proyecto
+        // Crear nuevo proyecto - Solo admins
+        requireAdmin();
         createProject($db);
         break;
         
     case 'PUT':
-        // Actualizar proyecto
+        // Actualizar proyecto - Solo admins
+        requireAdmin();
         updateProject($db);
         break;
         
     case 'DELETE':
-        // Eliminar proyecto
+        // Eliminar proyecto - Solo admins
+        requireAdmin();
         deleteProject($db);
         break;
         

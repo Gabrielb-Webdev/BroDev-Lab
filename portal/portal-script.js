@@ -30,6 +30,20 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (data.success && data.data) {
+            // Autenticar al cliente con su access code
+            try {
+                await fetch(`${API_BASE}/auth.php?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: accessCode,
+                        user_type: 'client'
+                    })
+                });
+            } catch (error) {
+                console.error('Error autenticando cliente:', error);
+            }
+            
             // Guardar código de acceso en sessionStorage
             sessionStorage.setItem('accessCode', accessCode);
             
@@ -266,8 +280,15 @@ function updateDashboard(project) {
 // ============================================
 // LOGOUT
 // ============================================
-document.getElementById('logoutBtn')?.addEventListener('click', () => {
+document.getElementById('logoutBtn')?.addEventListener('click', async () => {
     if (confirm('¿Seguro que deseas cerrar sesión?')) {
+        try {
+            // Cerrar sesión en el servidor
+            await fetch(`${API_BASE}/auth.php?action=logout`, { method: 'POST' });
+        } catch (error) {
+            console.error('Error al cerrar sesión:', error);
+        }
+        
         sessionStorage.removeItem('accessCode');
         clearInterval(updateInterval);
         location.reload();
@@ -327,6 +348,27 @@ function formatStatus(status) {
 // VERIFICAR SESIÓN AL CARGAR
 // ============================================
 window.addEventListener('DOMContentLoaded', async () => {
+    // Verificar si hay sesión activa de cliente
+    try {
+        const response = await fetch(`${API_BASE}/auth.php?action=verify`);
+        const data = await response.json();
+        
+        if (data.authenticated && data.user_type === 'client') {
+            // Usuario autenticado, cargar su proyecto
+            const projectResponse = await fetch(`${API_BASE}/projects.php?client_id=${data.user_id}`);
+            const projectData = await projectResponse.json();
+            
+            if (projectData.success && projectData.data && projectData.data.length > 0) {
+                // Cargar el primer proyecto del cliente
+                loadDashboard(projectData.data[0]);
+                return;
+            }
+        }
+    } catch (error) {
+        console.log('No hay sesión activa de cliente');
+    }
+    
+    // Si no hay sesión, verificar si hay accessCode guardado
     const accessCode = sessionStorage.getItem('accessCode');
     
     if (accessCode) {

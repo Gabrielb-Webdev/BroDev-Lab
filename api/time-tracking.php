@@ -5,7 +5,12 @@
  */
 
 require_once '../config/config.php';
+require_once '../config/auth-middleware.php';
+
 setCorsHeaders();
+
+// Requiere autenticación para time tracking
+requireAuth();
 
 $db = getDBConnection();
 $method = $_SERVER['REQUEST_METHOD'];
@@ -23,6 +28,9 @@ switch ($method) {
         break;
         
     case 'POST':
+        // Solo admins pueden iniciar/detener sesiones
+        requireAdmin();
+        
         // Iniciar nueva sesión de tiempo
         $action = $_GET['action'] ?? 'start';
         if ($action === 'start') {

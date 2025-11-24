@@ -5,6 +5,8 @@
  */
 
 require_once '../config/config.php';
+require_once '../config/auth-middleware.php';
+
 setCorsHeaders();
 
 $db = getDBConnection();
@@ -12,21 +14,36 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
+        // Requiere autenticación para ver clientes
+        requireAuth();
+        
         if (isset($_GET['access_code'])) {
             getClientByAccessCode($db, $_GET['access_code']);
         } elseif (isset($_GET['id'])) {
             getClientById($db, $_GET['id']);
         } else {
+            // Solo admins pueden ver todos los clientes
+            requireAdmin();
             getAllClients($db);
         }
         break;
         
     case 'POST':
+        // Solo admins pueden crear clientes
+        requireAdmin();
         createClient($db);
         break;
         
     case 'PUT':
+        // Solo admins pueden actualizar clientes
+        requireAdmin();
         updateClient($db);
+        break;
+        
+    case 'DELETE':
+        // Solo admins pueden eliminar clientes
+        requireAdmin();
+        deleteClient($db);
         break;
         
     default:

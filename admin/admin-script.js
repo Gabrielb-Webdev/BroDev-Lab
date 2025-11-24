@@ -16,12 +16,81 @@ let clients = [];
 // INICIALIZACIÓN
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
+    // Verificar autenticación primero
+    const isAuthenticated = await verifyAuthentication();
+    
+    if (!isAuthenticated) {
+        // Redirigir al login
+        window.location.href = './login.html';
+        return;
+    }
+    
     setupNavigation();
     setupModals();
     await loadInitialData();
     setupEventListeners();
     startAutoRefresh();
 });
+
+// ============================================
+// AUTENTICACIÓN
+// ============================================
+async function verifyAuthentication() {
+    try {
+        const response = await fetch(`${API_BASE}/auth.php?action=verify`);
+        const data = await response.json();
+        
+        if (data.authenticated && data.user_type === 'admin') {
+            // Cargar información del usuario
+            await loadCurrentUser();
+            return true;
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('Error verificando autenticación:', error);
+        return false;
+    }
+}
+
+async function loadCurrentUser() {
+    try {
+        const response = await fetch(`${API_BASE}/auth.php?action=current-user`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const user = data.data;
+            document.getElementById('adminName').textContent = user.full_name || user.username;
+            
+            // Actualizar avatar con iniciales
+            const initials = user.full_name 
+                ? user.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+                : user.username.substring(0, 2).toUpperCase();
+            document.querySelector('.admin-avatar').textContent = initials;
+        }
+    } catch (error) {
+        console.error('Error cargando usuario:', error);
+    }
+}
+
+async function handleAdminLogout() {
+    try {
+        const response = await fetch(`${API_BASE}/auth.php?action=logout`, {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            sessionStorage.clear();
+            window.location.href = './login.html';
+        }
+    } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+        // Redirigir de todos modos
+        window.location.href = './login.html';
+    }
+}
 
 // ============================================
 // NAVEGACIÓN
@@ -660,7 +729,7 @@ function setupEventListeners() {
     // Logout
     document.getElementById('adminLogoutBtn')?.addEventListener('click', () => {
         if (confirm('¿Cerrar sesión?')) {
-            location.reload();
+            handleAdminLogout();
         }
     });
 }

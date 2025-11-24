@@ -3,6 +3,21 @@
 -- BroDev Lab - Client Management System
 -- ============================================
 
+-- Tabla de Usuarios Admin
+CREATE TABLE IF NOT EXISTS admin_users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    role ENUM('super_admin', 'admin', 'editor') DEFAULT 'admin',
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP NULL,
+    created_by INT NULL,
+    FOREIGN KEY (created_by) REFERENCES admin_users(id) ON DELETE SET NULL
+);
+
 -- Tabla de Clientes
 CREATE TABLE IF NOT EXISTS clients (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -11,6 +26,7 @@ CREATE TABLE IF NOT EXISTS clients (
     phone VARCHAR(50),
     company VARCHAR(255),
     access_code VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_login TIMESTAMP NULL,
     status ENUM('active', 'inactive') DEFAULT 'active'
@@ -146,6 +162,21 @@ VALUES ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
 
 -- Índices para mejorar performance
 CREATE INDEX idx_client_email ON clients(email);
+-- Tabla de Sesiones de Usuario
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    user_type ENUM('admin', 'client') NOT NULL,
+    session_token VARCHAR(255) UNIQUE NOT NULL,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_session_token (session_token),
+    INDEX idx_expires (expires_at)
+);
+
+-- Índices para optimización
 CREATE INDEX idx_project_status ON projects(status);
 CREATE INDEX idx_project_client ON projects(client_id);
 CREATE INDEX idx_phase_project ON project_phases(project_id);
@@ -154,6 +185,8 @@ CREATE INDEX idx_time_active ON time_sessions(is_active);
 CREATE INDEX idx_activities_project ON project_activities(project_id);
 CREATE INDEX idx_messages_project ON messages(project_id);
 CREATE INDEX idx_notifications_client ON notifications(client_id);
+CREATE INDEX idx_admin_username ON admin_users(username);
+CREATE INDEX idx_admin_email ON admin_users(email);
 
 -- Vista para resumen de proyectos
 CREATE VIEW project_summary AS
@@ -175,3 +208,20 @@ FROM projects p
 JOIN clients c ON p.client_id = c.id
 LEFT JOIN project_phases pp ON p.id = pp.project_id
 GROUP BY p.id;
+
+-- ============================================
+-- DATOS INICIALES
+-- ============================================
+
+-- Crear usuario admin por defecto
+-- Usuario: admin / Password: Admin123!
+-- IMPORTANTE: Cambiar esta contraseña después del primer login
+INSERT INTO admin_users (username, email, password_hash, full_name, role, status) 
+VALUES (
+    'admin',
+    'admin@brodevlab.com',
+    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', -- Password: Admin123!
+    'Administrador Principal',
+    'super_admin',
+    'active'
+);
