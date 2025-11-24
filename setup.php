@@ -109,6 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
             'notifications', 'user_sessions'
         ];
         
+        $logs[] = "📊 Tablas encontradas: " . implode(', ', $tables);
+        
         $missingTables = array_diff($expectedTables, $tables);
         
         if (empty($missingTables)) {
@@ -119,8 +121,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
         
         // Verificar usuario admin
         $logs[] = "👤 Verificando usuario administrador...";
-        $stmt = $db->query("SELECT COUNT(*) FROM admin_users WHERE username = 'admin'");
-        $adminExists = $stmt->fetchColumn() > 0;
+        
+        // Verificar si la tabla admin_users existe antes de consultarla
+        if (in_array('admin_users', $tables)) {
+            $stmt = $db->query("SELECT COUNT(*) FROM admin_users WHERE username = 'admin'");
+            $adminExists = $stmt->fetchColumn() > 0;
+        } else {
+            $adminExists = false;
+            $logs[] = "⚠️ Tabla admin_users no existe, se creará el usuario después";
+        }
         
         if (!$adminExists) {
             $logs[] = "📝 Creando usuario admin...";
