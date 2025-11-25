@@ -52,7 +52,12 @@ async function verifyAuthentication() {
         
         console.log('📡 Respuesta recibida:', response.status);
         const data = await response.json();
-        console.log('📋 Datos de autenticación:', data);
+        console.log('📋 Datos de autenticación:', JSON.stringify(data, null, 2));
+        
+        // Verificar también el estado de la sesión PHP
+        const sessionCheck = await fetch('../check-session.php', { credentials: 'include' });
+        const sessionData = await sessionCheck.json();
+        console.log('🔐 Estado de sesión PHP:', JSON.stringify(sessionData, null, 2));
         
         if (data.authenticated && data.user_type === 'admin') {
             console.log('✅ Autenticación exitosa');
@@ -61,7 +66,7 @@ async function verifyAuthentication() {
             return true;
         }
         
-        console.log('❌ No autenticado o no es admin');
+        console.log('❌ No autenticado o no es admin. Razón:', data.debug || data.error || 'desconocida');
         return false;
     } catch (error) {
         console.error('❌ Error verificando autenticación:', error);
