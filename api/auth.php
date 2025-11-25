@@ -460,14 +460,4 @@ function handleRegisterAdmin($db) {
         sendJsonResponse(['error' => 'Error al crear usuario: ' . $e->getMessage()], 500);
     }
 }
-
-// ============================================
-// FUNCIÓN AUXILIAR
-// ============================================
-function sendJsonResponse($data, $statusCode = 200) {
-    http_response_code($statusCode);
-    header('Content-Type: application/json');
-    echo json_encode($data);
-    exit;
-}
 ?>
