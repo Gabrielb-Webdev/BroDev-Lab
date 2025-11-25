@@ -124,7 +124,7 @@ echo "<div class='box'>";
 echo "<h2>✅ Resumen</h2>";
 if (!empty($tables) && in_array('admin_users', $tables) && !empty($users)) {
     echo "<p class='success' style='font-size: 1.2em;'>🎉 Todo está configurado correctamente</p>";
-    echo "<p><a href='admin/login.html' style='display: inline-block; background: linear-gradient(135deg, #7C3AED, #EC4899); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;'>Ir al Login Admin →</a></p>";
+    echo "<p><a href='admin/login.php' style='display: inline-block; background: linear-gradient(135deg, #7C3AED, #EC4899); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;'>Ir al Login Admin →</a></p>";
     echo "<p style='margin-top: 20px;'><strong>Credenciales por defecto:</strong></p>";
     echo "<p>Usuario: <code style='background: #0f172a; padding: 4px 8px; border-radius: 4px;'>admin</code></p>";
     echo "<p>Contraseña: <code style='background: #0f172a; padding: 4px 8px; border-radius: 4px;'>Admin123!</code></p>";

@@ -140,7 +140,7 @@ try {
     echo "📋 CREDENCIALES DE ACCESO:\n";
     echo "   Usuario: admin\n";
     echo "   Password: Admin123!\n";
-    echo "   URL Admin: http://localhost/admin/login.html\n\n";
+    echo "   URL Admin: http://localhost/admin/login.php\n\n";
     
     echo "⚠️  IMPORTANTE:\n";
     echo "   1. Actualiza config/config.php con tus credenciales de BD\n";

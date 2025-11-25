@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     if (!isAuthenticated) {
         // Redirigir al login
-        window.location.href = './login.html';
+        window.location.href = './login.php';
         return;
     }
     
@@ -83,12 +83,12 @@ async function handleAdminLogout() {
         
         if (data.success) {
             sessionStorage.clear();
-            window.location.href = './login.html';
+            window.location.href = './login.php';
         }
     } catch (error) {
         console.error('Error al cerrar sesión:', error);
         // Redirigir de todos modos
-        window.location.href = './login.html';
+        window.location.href = './login.php';
     }
 }
 

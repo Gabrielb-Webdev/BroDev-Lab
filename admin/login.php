@@ -269,7 +269,7 @@
                 if (data.success) {
                     // Login exitoso - guardar datos y redirigir
                     sessionStorage.setItem('admin_user', JSON.stringify(data.data));
-                    window.location.href = './index.html';
+                    window.location.href = './index.php';
                 } else {
                     // Mostrar error
                     showError(data.error || 'Error al iniciar sesión');
@@ -314,7 +314,7 @@
                 
                 if (data.authenticated && data.user_type === 'admin') {
                     // Ya está autenticado, redirigir al dashboard
-                    window.location.href = './index.html';
+                    window.location.href = './index.php';
                 }
             } catch (error) {
                 console.log('No hay sesión activa');

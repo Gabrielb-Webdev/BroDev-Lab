@@ -25,7 +25,7 @@ if (file_exists($lockFile) && !isset($_GET['force'])) {
         <div class="container">
             <h1>✅ Sistema Ya Instalado</h1>
             <p>La base de datos ya fue configurada correctamente.</p>
-            <a href="admin/login.html">Ir al Login Admin</a>
+            <a href="admin/login.php">Ir al Login Admin</a>
             <br><br>
             <small>Para reinstalar, agrega ?force=1 a la URL</small>
         </div>
