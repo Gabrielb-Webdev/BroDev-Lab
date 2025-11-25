@@ -268,11 +268,17 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Login exitoso - guardar datos y redirigir inmediatamente
+                    console.log('✅ Login exitoso:', data);
+                    
+                    // Login exitoso - guardar datos
                     sessionStorage.setItem('admin_user', JSON.stringify(data.data));
                     
+                    console.log('🔄 Esperando para que la cookie se establezca...');
+                    // Pequeña espera para que la cookie de sesión se establezca
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    console.log('➡️ Redirigiendo al dashboard...');
                     // Redirigir al dashboard
-                    // La sesión PHP ya fue creada por el backend
                     window.location.href = './index.php';
                 } else {
                     // Mostrar error

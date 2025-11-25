@@ -16,14 +16,22 @@ let clients = [];
 // INICIALIZACIÓN
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🚀 Iniciando aplicación admin...');
+    
+    // Pequeña espera para asegurar que las cookies se hayan establecido
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     // Verificar autenticación primero
     const isAuthenticated = await verifyAuthentication();
     
     if (!isAuthenticated) {
+        console.log('⚠️ No autenticado, redirigiendo al login...');
         // Redirigir al login
         window.location.href = './login.php';
         return;
     }
+    
+    console.log('✅ Autenticado, cargando panel...');
     
     setupNavigation();
     setupModals();
