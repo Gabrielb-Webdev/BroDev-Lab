@@ -37,7 +37,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============================================
 async function verifyAuthentication() {
     try {
-        const response = await fetch(`${API_BASE}/auth.php?action=verify`);
+        const response = await fetch(`${API_BASE}/auth.php?action=verify`, {
+            credentials: 'include'
+        });
         const data = await response.json();
         
         if (data.authenticated && data.user_type === 'admin') {
@@ -55,7 +57,9 @@ async function verifyAuthentication() {
 
 async function loadCurrentUser() {
     try {
-        const response = await fetch(`${API_BASE}/auth.php?action=current-user`);
+        const response = await fetch(`${API_BASE}/auth.php?action=current-user`, {
+            credentials: 'include'
+        });
         const data = await response.json();
         
         if (data.success) {
@@ -76,7 +80,8 @@ async function loadCurrentUser() {
 async function handleAdminLogout() {
     try {
         const response = await fetch(`${API_BASE}/auth.php?action=logout`, {
-            method: 'POST'
+            method: 'POST',
+            credentials: 'include'
         });
         
         const data = await response.json();
@@ -183,7 +188,7 @@ async function loadViewData(viewName) {
 // ============================================
 async function loadProjects() {
     try {
-        const response = await fetch(`${API_BASE}/projects.php`);
+        const response = await fetch(`${API_BASE}/projects.php`, { credentials: 'include' });
         const data = await response.json();
         
         if (data.success) {
@@ -251,6 +256,7 @@ async function createProject(formData) {
     try {
         const response = await fetch(`${API_BASE}/projects.php`, {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         });
@@ -276,7 +282,8 @@ async function deleteProject(id) {
     
     try {
         const response = await fetch(`${API_BASE}/projects.php?id=${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            credentials: 'include'
         });
         
         const data = await response.json();
@@ -304,7 +311,7 @@ function viewProject(id) {
 // ============================================
 async function loadClients() {
     try {
-        const response = await fetch(`${API_BASE}/clients.php`);
+        const response = await fetch(`${API_BASE}/clients.php`, { credentials: 'include' });
         const data = await response.json();
         
         if (data.success) {
@@ -382,6 +389,7 @@ async function createClient(formData) {
     try {
         const response = await fetch(`${API_BASE}/clients.php`, {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         });
@@ -407,7 +415,8 @@ async function deleteClient(id) {
     
     try {
         const response = await fetch(`${API_BASE}/clients.php?id=${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            credentials: 'include'
         });
         
         const data = await response.json();
@@ -434,7 +443,7 @@ function copyAccessCode(code) {
 // ============================================
 async function checkActiveSession() {
     try {
-        const response = await fetch(`${API_BASE}/time-tracking.php?active=1`);
+        const response = await fetch(`${API_BASE}/time-tracking.php?active=1`, { credentials: 'include' });
         const data = await response.json();
         
         if (data.success && data.data && data.data.length > 0) {
@@ -449,7 +458,7 @@ async function checkActiveSession() {
 
 async function loadTimeSessions() {
     try {
-        const response = await fetch(`${API_BASE}/time-tracking.php`);
+        const response = await fetch(`${API_BASE}/time-tracking.php`, { credentials: 'include' });
         const data = await response.json();
         
         if (data.success) {
@@ -711,7 +720,7 @@ function setupEventListeners() {
         }
         
         try {
-            const response = await fetch(`${API_BASE}/projects.php?id=${projectId}`);
+            const response = await fetch(`${API_BASE}/projects.php?id=${projectId}`, { credentials: 'include' });
             const data = await response.json();
             
             if (data.success && data.data.phases) {
