@@ -268,23 +268,12 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Login exitoso - guardar datos
+                    // Login exitoso - guardar datos y redirigir inmediatamente
                     sessionStorage.setItem('admin_user', JSON.stringify(data.data));
                     
-                    // Esperar un momento para que la sesión PHP se establezca
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    
-                    // Verificar que la sesión esté activa antes de redirigir
-                    const verifyResponse = await fetch(`${API_BASE}/auth.php?action=verify`, {
-                        credentials: 'include' // Importante: incluir cookies
-                    });
-                    const verifyData = await verifyResponse.json();
-                    
-                    if (verifyData.authenticated) {
-                        window.location.href = './index.php';
-                    } else {
-                        showError('Error al establecer la sesión. Por favor intenta de nuevo.');
-                    }
+                    // Redirigir al dashboard
+                    // La sesión PHP ya fue creada por el backend
+                    window.location.href = './index.php';
                 } else {
                     // Mostrar error
                     showError(data.error || 'Error al iniciar sesión');
