@@ -291,14 +291,25 @@ function verifySession($db) {
         // Verificar que la tabla existe
         $tableCheck = $db->query("SHOW TABLES LIKE 'user_sessions'");
         if ($tableCheck->rowCount() === 0) {
-            sendJsonResponse(['authenticated' => false, 'error' => 'Base de datos no configurada'], 200);
+            sendJsonResponse(['authenticated' => false, 'error' => 'Base de datos no configurada', 'debug' => 'tabla no existe'], 200);
             return;
         }
+        
+        // Debug: Ver qué hay en la sesión
+        $sessionData = [
+            'session_id' => session_id(),
+            'has_token' => isset($_SESSION['session_token']),
+            'session_keys' => array_keys($_SESSION)
+        ];
         
         $sessionToken = $_SESSION['session_token'] ?? null;
         
         if (!$sessionToken) {
-            sendJsonResponse(['authenticated' => false], 200);
+            sendJsonResponse([
+                'authenticated' => false, 
+                'debug' => 'no session token',
+                'session_info' => $sessionData
+            ], 200);
             return;
         }
         

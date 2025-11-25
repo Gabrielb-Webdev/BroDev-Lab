@@ -37,20 +37,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============================================
 async function verifyAuthentication() {
     try {
+        console.log('🔍 Verificando autenticación...');
         const response = await fetch(`${API_BASE}/auth.php?action=verify`, {
             credentials: 'include' // Incluir cookies de sesión
         });
+        
+        console.log('📡 Respuesta recibida:', response.status);
         const data = await response.json();
+        console.log('📋 Datos de autenticación:', data);
         
         if (data.authenticated && data.user_type === 'admin') {
+            console.log('✅ Autenticación exitosa');
             // Cargar información del usuario
             await loadCurrentUser();
             return true;
         }
         
+        console.log('❌ No autenticado o no es admin');
         return false;
     } catch (error) {
-        console.error('Error verificando autenticación:', error);
+        console.error('❌ Error verificando autenticación:', error);
         return false;
     }
 }
