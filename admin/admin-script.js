@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function verifyAuthentication() {
     try {
         const response = await fetch(`${API_BASE}/auth.php?action=verify`, {
-            credentials: 'include'
+            credentials: 'include' // Incluir cookies de sesión
         });
         const data = await response.json();
         
@@ -188,7 +188,7 @@ async function loadViewData(viewName) {
 // ============================================
 async function loadProjects() {
     try {
-        const response = await fetch(`${API_BASE}/projects.php`, { credentials: 'include' });
+        const response = await fetch(`${API_BASE}/projects.php`);
         const data = await response.json();
         
         if (data.success) {
@@ -256,7 +256,6 @@ async function createProject(formData) {
     try {
         const response = await fetch(`${API_BASE}/projects.php`, {
             method: 'POST',
-            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         });
@@ -282,8 +281,7 @@ async function deleteProject(id) {
     
     try {
         const response = await fetch(`${API_BASE}/projects.php?id=${id}`, {
-            method: 'DELETE',
-            credentials: 'include'
+            method: 'DELETE'
         });
         
         const data = await response.json();
@@ -311,7 +309,7 @@ function viewProject(id) {
 // ============================================
 async function loadClients() {
     try {
-        const response = await fetch(`${API_BASE}/clients.php`, { credentials: 'include' });
+        const response = await fetch(`${API_BASE}/clients.php`);
         const data = await response.json();
         
         if (data.success) {
@@ -389,7 +387,6 @@ async function createClient(formData) {
     try {
         const response = await fetch(`${API_BASE}/clients.php`, {
             method: 'POST',
-            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         });
@@ -415,8 +412,7 @@ async function deleteClient(id) {
     
     try {
         const response = await fetch(`${API_BASE}/clients.php?id=${id}`, {
-            method: 'DELETE',
-            credentials: 'include'
+            method: 'DELETE'
         });
         
         const data = await response.json();
@@ -443,7 +439,7 @@ function copyAccessCode(code) {
 // ============================================
 async function checkActiveSession() {
     try {
-        const response = await fetch(`${API_BASE}/time-tracking.php?active=1`, { credentials: 'include' });
+        const response = await fetch(`${API_BASE}/time-tracking.php?active=1`);
         const data = await response.json();
         
         if (data.success && data.data && data.data.length > 0) {
@@ -458,7 +454,7 @@ async function checkActiveSession() {
 
 async function loadTimeSessions() {
     try {
-        const response = await fetch(`${API_BASE}/time-tracking.php`, { credentials: 'include' });
+        const response = await fetch(`${API_BASE}/time-tracking.php`);
         const data = await response.json();
         
         if (data.success) {
@@ -720,7 +716,7 @@ function setupEventListeners() {
         }
         
         try {
-            const response = await fetch(`${API_BASE}/projects.php?id=${projectId}`, { credentials: 'include' });
+            const response = await fetch(`${API_BASE}/projects.php?id=${projectId}`);
             const data = await response.json();
             
             if (data.success && data.data.phases) {

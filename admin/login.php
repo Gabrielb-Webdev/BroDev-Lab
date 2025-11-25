@@ -254,10 +254,10 @@
             try {
                 const response = await fetch(`${API_BASE}/auth.php?action=login`, {
                     method: 'POST',
-                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json'
                     },
+                    credentials: 'include', // Importante: incluir cookies
                     body: JSON.stringify({
                         username: username,
                         password: password,
@@ -268,9 +268,23 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Login exitoso - guardar datos y redirigir
+                    // Login exitoso - guardar datos
                     sessionStorage.setItem('admin_user', JSON.stringify(data.data));
-                    window.location.href = './index.php';
+                    
+                    // Esperar un momento para que la sesión PHP se establezca
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // Verificar que la sesión esté activa antes de redirigir
+                    const verifyResponse = await fetch(`${API_BASE}/auth.php?action=verify`, {
+                        credentials: 'include' // Importante: incluir cookies
+                    });
+                    const verifyData = await verifyResponse.json();
+                    
+                    if (verifyData.authenticated) {
+                        window.location.href = './index.php';
+                    } else {
+                        showError('Error al establecer la sesión. Por favor intenta de nuevo.');
+                    }
                 } else {
                     // Mostrar error
                     showError(data.error || 'Error al iniciar sesión');
@@ -310,9 +324,7 @@
         // Verificar si ya está autenticado
         window.addEventListener('DOMContentLoaded', async () => {
             try {
-                const response = await fetch(`${API_BASE}/auth.php?action=verify`, {
-                    credentials: 'include'
-                });
+                const response = await fetch(`${API_BASE}/auth.php?action=verify`);
                 const data = await response.json();
                 
                 if (data.authenticated && data.user_type === 'admin') {
