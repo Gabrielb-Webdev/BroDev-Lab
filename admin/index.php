@@ -562,6 +562,19 @@
         </div>
     </div>
 
+    <script src="dynamic-system.js?v=1.0"></script>
+    <script src="field-editor.js?v=1.0"></script>
     <script src="admin-script.js?v=2.9"></script>
+    <!-- Ejemplos de uso (solo en desarrollo) -->
+    <script src="examples-dynamic-system.js?v=1.0"></script>
+    
+    <script>
+        // Inicializar sistema dinámico al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                initDynamicSystem();
+            }, 500);
+        });
+    </script>
 </body>
 </html>

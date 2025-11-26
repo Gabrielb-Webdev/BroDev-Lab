@@ -2463,6 +2463,661 @@ select.form-control option:last-child {
     }
 }
 
+/* ==================== SISTEMA DINÁMICO DE TABLAS ==================== */
+
+/* Notificación de Sincronización */
+.sync-notification {
+    position: fixed;
+    top: 20px;
+    right: -300px;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.95), rgba(59, 130, 246, 0.95));
+    color: #ffffff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 10000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: right 0.3s ease;
+}
+
+.sync-notification.show {
+    right: 20px;
+}
+
+.sync-icon {
+    font-size: 1.2rem;
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.sync-message {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Contenedor de Tabla Dinámica */
+.dynamic-table-wrapper {
+    background: rgba(26, 11, 46, 0.95);
+    border: 2px solid rgba(124, 58, 237, 0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 20px 0;
+}
+
+/* Toolbar de Tabla */
+.table-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: rgba(30, 20, 60, 0.7);
+    border-bottom: 2px solid rgba(124, 58, 237, 0.2);
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.toolbar-left,
+.toolbar-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.table-toolbar select {
+    min-width: 200px;
+    background: rgba(124, 58, 237, 0.2);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+/* Contenedor de Tabla con Scroll */
+.table-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 600px;
+}
+
+/* Tabla Dinámica */
+.dynamic-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.9rem;
+}
+
+.dynamic-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(30, 20, 60, 0.98);
+}
+
+.dynamic-table th {
+    background: rgba(30, 20, 60, 0.98);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 2px solid rgba(124, 58, 237, 0.4);
+    white-space: nowrap;
+    user-select: none;
+}
+
+.dynamic-table th.sortable {
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.dynamic-table th.sortable:hover {
+    background: rgba(124, 58, 237, 0.3);
+}
+
+.th-content {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.field-icon {
+    font-size: 1.1rem;
+}
+
+.field-label {
+    flex: 1;
+}
+
+.required-badge {
+    color: #ef4444;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.sort-indicator {
+    color: #7c3aed;
+    font-size: 0.8rem;
+}
+
+.checkbox-column {
+    width: 40px;
+    text-align: center;
+}
+
+.actions-column {
+    width: 100px;
+    text-align: center;
+}
+
+/* Filas de Tabla */
+.dynamic-table tbody tr {
+    background: rgba(26, 11, 46, 0.6);
+    transition: all 0.2s ease;
+}
+
+.dynamic-table tbody tr:hover {
+    background: rgba(30, 20, 60, 0.8);
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+}
+
+.dynamic-table tbody tr.selected {
+    background: rgba(124, 58, 237, 0.2);
+    border-left: 4px solid #7c3aed;
+}
+
+/* Celdas */
+.dynamic-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+    color: #ffffff;
+}
+
+.field-cell {
+    cursor: pointer;
+    transition: background 0.2s ease;
+    position: relative;
+}
+
+.field-cell:hover {
+    background: rgba(124, 58, 237, 0.15);
+}
+
+.field-cell.editing {
+    background: rgba(59, 130, 246, 0.2);
+    padding: 4px;
+}
+
+.field-cell.saving {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.field-cell.saving::after {
+    content: '⏳';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: pulse 1s infinite;
+}
+
+/* Valores de Celda */
+.empty-value {
+    color: #64748b;
+    font-style: italic;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 2px;
+}
+
+.badge-primary {
+    background: rgba(124, 58, 237, 0.3);
+    color: #a78bfa;
+    border: 1px solid rgba(124, 58, 237, 0.5);
+}
+
+.cell-link {
+    color: #60a5fa;
+    text-decoration: none;
+}
+
+.cell-link:hover {
+    text-decoration: underline;
+}
+
+.color-preview {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+/* Editores de Celda */
+.cell-input,
+.cell-select,
+.cell-textarea {
+    width: 100%;
+    background: rgba(30, 20, 60, 0.9);
+    border: 2px solid rgba(124, 58, 237, 0.5);
+    color: #ffffff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+
+.cell-input:focus,
+.cell-select:focus,
+.cell-textarea:focus {
+    outline: none;
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+.cell-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.cell-textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.rating-editor {
+    display: flex;
+    gap: 4px;
+}
+
+.rating-star {
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0.3;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.rating-star.active {
+    opacity: 1;
+}
+
+.rating-star:hover {
+    transform: scale(1.2);
+}
+
+/* Botones de Ícono */
+.btn-icon {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 6px;
+    transition: transform 0.2s ease;
+}
+
+.btn-icon:hover {
+    transform: scale(1.2);
+}
+
+/* Estado Vacío */
+.empty-table {
+    padding: 60px 20px;
+}
+
+.empty-state {
+    text-align: center;
+    color: #94a3b8;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* ==================== MODALES PERSONALIZADOS ==================== */
+
+.custom-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 20px;
+}
+
+.custom-modal.show {
+    opacity: 1;
+}
+
+.modal-dialog {
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-dialog.modal-lg {
+    max-width: 900px;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, rgba(26, 11, 46, 0.98), rgba(30, 20, 60, 0.98));
+    border: 2px solid rgba(124, 58, 237, 0.4);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 2px solid rgba(124, 58, 237, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 1.5rem;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+}
+
+.modal-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 2px solid rgba(124, 58, 237, 0.3);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Formularios en Modales */
+.form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 0;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.col-md-4 {
+    flex: 0 0 33.333%;
+}
+
+.col-md-6 {
+    flex: 0 0 50%;
+}
+
+.form-group label {
+    display: block;
+    color: #ffffff;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+.form-control {
+    width: 100%;
+    background: rgba(30, 20, 60, 0.7);
+    border: 2px solid rgba(124, 58, 237, 0.3);
+    color: #ffffff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+    background: rgba(30, 20, 60, 0.9);
+}
+
+.form-control-sm {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+}
+
+.form-text {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-check-input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.form-check-label {
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 0;
+}
+
+.field-options-section {
+    background: rgba(30, 20, 60, 0.5);
+    border: 2px solid rgba(124, 58, 237, 0.2);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+/* ==================== RESPONSIVE TABLA DINÁMICA ==================== */
+
+@media (max-width: 1400px) {
+    .dynamic-table {
+        font-size: 0.85rem;
+    }
+    
+    .dynamic-table th,
+    .dynamic-table td {
+        padding: 10px 8px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .table-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .toolbar-left,
+    .toolbar-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 768px) {
+    .dynamic-table-wrapper {
+        margin: 10px 0;
+    }
+    
+    .table-container {
+        max-height: 500px;
+    }
+    
+    .dynamic-table {
+        font-size: 0.8rem;
+    }
+    
+    .dynamic-table th,
+    .dynamic-table td {
+        padding: 8px 6px;
+    }
+    
+    .field-icon {
+        font-size: 1rem;
+    }
+    
+    .actions-column {
+        width: 80px;
+    }
+    
+    .modal-dialog {
+        max-width: 95%;
+    }
+    
+    .form-row {
+        flex-direction: column;
+    }
+    
+    .col-md-4,
+    .col-md-6 {
+        flex: 0 0 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .toolbar-left,
+    .toolbar-right {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .table-toolbar select {
+        width: 100%;
+    }
+    
+    .dynamic-table th,
+    .dynamic-table td {
+        padding: 6px 4px;
+        font-size: 0.75rem;
+    }
+    
+    .btn-icon {
+        font-size: 1rem;
+        padding: 4px;
+    }
+}
+
+/* ==================== INDICADORES DE ESTADO ==================== */
+
+.field-cell[data-type="select"] .badge,
+.field-cell[data-type="priority"] .badge {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.field-cell[data-type="percentage"]::after {
+    content: '%';
+    color: #94a3b8;
+    margin-left: 2px;
+}
+
+/* Animaciones */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.dynamic-table tbody tr {
+    animation: slideIn 0.3s ease;
+}
+
+/* Scrollbar personalizado para tabla */
+.table-container::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: rgba(30, 20, 60, 0.5);
+    border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: rgba(124, 58, 237, 0.5);
+    border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(124, 58, 237, 0.7);
+}
+
 .empty-list-icon {
     font-size: 4rem;
     margin-bottom: 16px;
