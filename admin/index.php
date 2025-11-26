@@ -45,7 +45,7 @@
         
         <div class="sidebar-footer">
             <button id="adminLogoutBtn" class="btn-admin-logout">
-                <span>🚪</span> Cerrar Sesión
+                <span>🔄</span> Recargar Panel
             </button>
         </div>
     </aside>
