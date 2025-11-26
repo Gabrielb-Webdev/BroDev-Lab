@@ -115,7 +115,13 @@ function startTimer($db) {
         
         // Actualizar estado de la fase si existe
         if (!empty($data['phase_id'])) {
-            $stmt = $db->prepare("UPDATE project_phases SET status = 'in_progress', start_date = NOW() WHERE id = ? AND start_date IS NULL");
+            // Actualizar estado a in_progress y establecer start_date si no existe
+            $stmt = $db->prepare("
+                UPDATE project_phases 
+                SET status = 'in_progress', 
+                    start_date = COALESCE(start_date, NOW())
+                WHERE id = ?
+            ");
             $stmt->execute([$data['phase_id']]);
         }
         

@@ -1327,6 +1327,12 @@ document.getElementById('startTimerBtn')?.addEventListener('click', async () => 
             document.getElementById('timerStatus').textContent = '🟢 En ejecución';
             document.getElementById('startTimerBtn').style.display = 'none';
             document.getElementById('stopTimerBtn').style.display = 'block';
+            
+            // Recargar las fases para mostrar el estado actualizado
+            if (phaseId) {
+                await loadProjectPhases(currentProjectDetail.id);
+                renderPhasesList();
+            }
         } else {
             showNotification(data.error || 'Error al iniciar timer', 'error');
         }
