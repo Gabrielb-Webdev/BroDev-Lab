@@ -1439,7 +1439,11 @@ document.getElementById('stopTimerBtn')?.addEventListener('click', async () => {
         const data = await response.json();
         
         if (data.success) {
-            showNotification(`⏹️ Timer detenido - ${data.duration_hours || '0'}h registradas`, 'success');
+            const hours = Math.floor(data.duration_seconds / 3600);
+            const minutes = Math.floor((data.duration_seconds % 3600) / 60);
+            const seconds = data.duration_seconds % 60;
+            const timeStr = hours > 0 ? `${hours}h ${minutes}m ${seconds}s` : minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+            showNotification(`⏹️ Timer detenido - ${timeStr} registrados`, 'success');
             stopTimerDisplay();
             // Limpiar sesión global
             currentTimerSession = null;
