@@ -1220,7 +1220,7 @@ function startTimerDisplay(elapsedSeconds = 0) {
         }
     }, 1000);
     
-    // Sincronizar con el servidor cada 15 segundos para corregir cualquier drift
+    // Sincronizar con el servidor cada 60 segundos para corregir cualquier drift
     timerSyncInterval = setInterval(async () => {
         if (!currentTimerSession || !timerStartTime) {
             return;
@@ -1238,8 +1238,8 @@ function startTimerDisplay(elapsedSeconds = 0) {
                 const serverElapsed = parseInt(data.data.elapsed_seconds);
                 const clientElapsed = Math.floor((Date.now() - timerStartTime) / 1000);
                 
-                // Solo ajustar si hay una diferencia mayor a 2 segundos (para evitar ajustes innecesarios)
-                if (Math.abs(serverElapsed - clientElapsed) > 2) {
+                // Solo ajustar si hay una diferencia mayor a 3 segundos (para evitar ajustes innecesarios)
+                if (Math.abs(serverElapsed - clientElapsed) > 3) {
                     console.log(`⏱️ Sincronizando timer: ${clientElapsed}s -> ${serverElapsed}s`);
                     timerStartTime = Date.now() - (serverElapsed * 1000);
                 }
@@ -1252,7 +1252,7 @@ function startTimerDisplay(elapsedSeconds = 0) {
         } catch (error) {
             console.error('Error sincronizando timer:', error);
         }
-    }, 15000); // Cada 15 segundos
+    }, 60000); // Cada 60 segundos
 }
 
 function stopTimerDisplay() {
