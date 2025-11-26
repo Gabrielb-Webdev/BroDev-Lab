@@ -110,7 +110,6 @@
         <!-- Projects View -->
         <div id="projectsView" class="admin-view" style="display: none;">
             <div class="view-header">
-                <h2>Gestión de Proyectos</h2>
                 <button id="newProjectBtn" class="btn-action">
                     <span class="btn-icon">📁</span>
                     <span>Nuevo Proyecto</span>
@@ -122,7 +121,6 @@
         <!-- Clients View -->
         <div id="clientsView" class="admin-view" style="display: none;">
             <div class="view-header">
-                <h2>Gestión de Clientes</h2>
                 <button id="newClientBtn" class="btn-action">
                     <span class="btn-icon">👥</span>
                     <span>Nuevo Cliente</span>

@@ -756,10 +756,8 @@ function setupEventListeners() {
     });
     
     // Logout
-    document.getElementById('adminLogoutBtn')?.addEventListener('click', () => {
-        if (confirm('¿Cerrar sesión?')) {
-            handleAdminLogout();
-        }
+    document.getElementById('adminLogoutBtn')?.addEventListener('click', async () => {
+        handleAdminLogout();
     });
 }
 
