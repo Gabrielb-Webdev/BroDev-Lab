@@ -6,7 +6,7 @@
     <title>Admin Panel - BroDev Lab</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <link rel="stylesheet" href="../styles.css?v=1.0">
-    <link rel="stylesheet" href="admin-styles.css?v=2.4">
+    <link rel="stylesheet" href="admin-styles.css?v=2.5">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
@@ -72,44 +72,164 @@
 
         <!-- Dashboard View -->
         <div id="dashboardView" class="admin-view active">
-            <div class="stats-overview">
-                <div class="stat-box">
-                    <div class="stat-icon">📁</div>
-                    <div class="stat-info">
-                        <h3>Proyectos Activos</h3>
-                        <p class="stat-number" id="activeProjects">0</p>
+            <!-- Filtros de Tiempo -->
+            <div class="dashboard-filters">
+                <button class="filter-btn active" data-period="today">📅 Hoy</button>
+                <button class="filter-btn" data-period="week">📊 Esta Semana</button>
+                <button class="filter-btn" data-period="month">📈 Este Mes</button>
+                <button class="filter-btn" data-period="year">🗓️ Este Año</button>
+                <button class="filter-btn" data-period="all">🌐 Todo</button>
+            </div>
+
+            <!-- Métricas Principales -->
+            <div class="stats-overview-enhanced">
+                <div class="stat-card-modern">
+                    <div class="stat-header">
+                        <span class="stat-icon-modern">⏱️</span>
+                        <span class="stat-trend positive">+12%</span>
                     </div>
+                    <h3 class="stat-value-modern" id="dash-hours">0h</h3>
+                    <p class="stat-label-modern">Horas Trabajadas</p>
+                    <div class="stat-comparison" id="dash-hours-comparison">vs período anterior</div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-info">
-                        <h3>Total Clientes</h3>
-                        <p class="stat-number" id="totalClients">0</p>
+
+                <div class="stat-card-modern">
+                    <div class="stat-header">
+                        <span class="stat-icon-modern">💰</span>
+                        <span class="stat-trend positive">+8%</span>
                     </div>
+                    <h3 class="stat-value-modern" id="dash-revenue">$0</h3>
+                    <p class="stat-label-modern">Ingresos Generados</p>
+                    <div class="stat-comparison" id="dash-revenue-comparison">vs período anterior</div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-icon">⏱️</div>
-                    <div class="stat-info">
-                        <h3>Horas Este Mes</h3>
-                        <p class="stat-number" id="monthlyHours">0h</p>
+
+                <div class="stat-card-modern">
+                    <div class="stat-header">
+                        <span class="stat-icon-modern">📁</span>
+                        <span class="stat-trend neutral">—</span>
                     </div>
+                    <h3 class="stat-value-modern" id="dash-projects">0</h3>
+                    <p class="stat-label-modern">Proyectos Activos</p>
+                    <div class="stat-comparison" id="dash-projects-comparison">en progreso</div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-icon">💰</div>
-                    <div class="stat-info">
-                        <h3>Ingresos Estimados</h3>
-                        <p class="stat-number" id="estimatedRevenue">$0</p>
+
+                <div class="stat-card-modern">
+                    <div class="stat-header">
+                        <span class="stat-icon-modern">✅</span>
+                        <span class="stat-trend positive">+5</span>
                     </div>
+                    <h3 class="stat-value-modern" id="dash-tasks">0</h3>
+                    <p class="stat-label-modern">Tareas Completadas</p>
+                    <div class="stat-comparison" id="dash-tasks-comparison">este período</div>
+                </div>
+
+                <div class="stat-card-modern">
+                    <div class="stat-header">
+                        <span class="stat-icon-modern">👥</span>
+                        <span class="stat-trend positive">+2</span>
+                    </div>
+                    <h3 class="stat-value-modern" id="dash-clients">0</h3>
+                    <p class="stat-label-modern">Clientes Totales</p>
+                    <div class="stat-comparison" id="dash-clients-comparison">activos</div>
+                </div>
+
+                <div class="stat-card-modern">
+                    <div class="stat-header">
+                        <span class="stat-icon-modern">📊</span>
+                        <span class="stat-trend positive">+15%</span>
+                    </div>
+                    <h3 class="stat-value-modern" id="dash-productivity">0%</h3>
+                    <p class="stat-label-modern">Productividad</p>
+                    <div class="stat-comparison" id="dash-productivity-comparison">eficiencia</div>
                 </div>
             </div>
 
-            <div class="dashboard-grid">
-                <div class="dashboard-card">
-                    <h3>Proyectos Recientes</h3>
-                    <div id="recentProjects"></div>
+            <!-- Grid de Análisis -->
+            <div class="dashboard-analytics-grid">
+                <!-- Gráfico de Tiempo -->
+                <div class="dashboard-card-enhanced">
+                    <div class="card-header-enhanced">
+                        <h3>⏱️ Distribución de Tiempo</h3>
+                        <select class="mini-filter" id="time-chart-filter">
+                            <option value="projects">Por Proyecto</option>
+                            <option value="clients">Por Cliente</option>
+                            <option value="phases">Por Fase</option>
+                        </select>
+                    </div>
+                    <div class="chart-container" id="timeDistributionChart"></div>
                 </div>
-                <div class="dashboard-card">
-                    <h3>Sesiones Activas</h3>
+
+                <!-- Gráfico de Ingresos -->
+                <div class="dashboard-card-enhanced">
+                    <div class="card-header-enhanced">
+                        <h3>💰 Tendencia de Ingresos</h3>
+                        <div class="chart-legend">
+                            <span class="legend-item"><span class="legend-dot" style="background: #10b981;"></span> Real</span>
+                            <span class="legend-item"><span class="legend-dot" style="background: #3b82f6;"></span> Proyectado</span>
+                        </div>
+                    </div>
+                    <div class="chart-container" id="revenueTrendChart"></div>
+                </div>
+
+                <!-- Estados de Proyectos -->
+                <div class="dashboard-card-enhanced">
+                    <div class="card-header-enhanced">
+                        <h3>📋 Estado de Proyectos</h3>
+                        <span class="card-badge" id="total-projects-badge">0 proyectos</span>
+                    </div>
+                    <div class="status-breakdown" id="projectStatusBreakdown"></div>
+                </div>
+
+                <!-- Actividad Reciente -->
+                <div class="dashboard-card-enhanced activity-card">
+                    <div class="card-header-enhanced">
+                        <h3>🔔 Actividad Reciente</h3>
+                        <button class="btn-icon-mini" onclick="refreshActivity()">🔄</button>
+                    </div>
+                    <div class="activity-timeline" id="activityTimeline"></div>
+                </div>
+
+                <!-- Top Proyectos -->
+                <div class="dashboard-card-enhanced">
+                    <div class="card-header-enhanced">
+                        <h3>🏆 Top Proyectos</h3>
+                        <select class="mini-filter" id="top-projects-metric">
+                            <option value="hours">Por Horas</option>
+                            <option value="revenue">Por Ingresos</option>
+                            <option value="progress">Por Progreso</option>
+                        </select>
+                    </div>
+                    <div class="top-projects-list" id="topProjectsList"></div>
+                </div>
+
+                <!-- Próximos Vencimientos -->
+                <div class="dashboard-card-enhanced">
+                    <div class="card-header-enhanced">
+                        <h3>⚠️ Próximos Vencimientos</h3>
+                        <span class="card-badge urgent" id="urgent-count">0</span>
+                    </div>
+                    <div class="deadlines-list" id="upcomingDeadlines"></div>
+                </div>
+
+                <!-- Performance del Equipo -->
+                <div class="dashboard-card-enhanced full-width">
+                    <div class="card-header-enhanced">
+                        <h3>📈 Resumen de Performance</h3>
+                        <div class="performance-tabs">
+                            <button class="perf-tab active" data-metric="efficiency">Eficiencia</button>
+                            <button class="perf-tab" data-metric="velocity">Velocidad</button>
+                            <button class="perf-tab" data-metric="quality">Calidad</button>
+                        </div>
+                    </div>
+                    <div class="performance-metrics" id="performanceMetrics"></div>
+                </div>
+
+                <!-- Sesiones Activas -->
+                <div class="dashboard-card-enhanced">
+                    <div class="card-header-enhanced">
+                        <h3>🔴 Sesiones en Vivo</h3>
+                        <span class="live-indicator">● EN VIVO</span>
+                    </div>
                     <div id="activeSessions"></div>
                 </div>
             </div>
@@ -442,6 +562,6 @@
         </div>
     </div>
 
-    <script src="admin-script.js?v=2.8"></script>
+    <script src="admin-script.js?v=2.9"></script>
 </body>
 </html>

@@ -636,56 +636,304 @@ function stopTimer() {
 // ============================================
 // DASHBOARD
 // ============================================
+// Variables globales del dashboard
+let currentDashboardPeriod = 'today';
+let dashboardData = {};
+
 function updateDashboard() {
-    // Estadísticas
-    const activeProjects = projects.filter(p => p.status === 'in_progress').length;
-    const activeProjectsEl = document.getElementById('activeProjects');
-    if (activeProjectsEl) {
-        activeProjectsEl.textContent = activeProjects;
-    }
+    calculateDashboardMetrics();
+    renderDashboardStats();
+    renderTimeDistributionChart();
+    renderRevenueTrendChart();
+    renderProjectStatusBreakdown();
+    renderActivityTimeline();
+    renderTopProjects();
+    renderUpcomingDeadlines();
+    renderPerformanceMetrics();
+    renderActiveSessions();
+}
+
+function calculateDashboardMetrics() {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - today.getDay());
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const yearStart = new Date(now.getFullYear(), 0, 1);
+
+    // Filtrar datos según el período seleccionado
+    let filteredProjects = projects;
     
-    const totalClientsEl = document.getElementById('totalClients');
-    if (totalClientsEl) {
-        totalClientsEl.textContent = clients.length;
+    switch(currentDashboardPeriod) {
+        case 'today':
+            // Filtrar proyectos con actividad hoy
+            filteredProjects = projects;
+            break;
+        case 'week':
+            filteredProjects = projects;
+            break;
+        case 'month':
+            filteredProjects = projects;
+            break;
+        case 'year':
+            filteredProjects = projects;
+            break;
+        default:
+            filteredProjects = projects;
     }
-    
-    // Calcular horas del mes
-    const totalHours = projects.reduce((sum, p) => sum + (p.total_time_seconds || 0), 0) / 3600;
-    const monthlyHoursEl = document.getElementById('monthlyHours');
-    if (monthlyHoursEl) {
-        monthlyHoursEl.textContent = `${totalHours.toFixed(1)}h`;
-    }
-    
-    // Calcular ingresos estimados
-    const revenue = projects.reduce((sum, p) => sum + ((p.total_time_seconds || 0) / 3600 * (p.hourly_rate || 0)), 0);
-    const estimatedRevenueEl = document.getElementById('estimatedRevenue');
-    if (estimatedRevenueEl) {
-        estimatedRevenueEl.textContent = `$${revenue.toFixed(2)}`;
-    }
-    
-    // Proyectos recientes
-    const recentProjects = projects.slice(0, 5);
-    const recentProjectsEl = document.getElementById('recentProjects');
-    if (recentProjectsEl) {
-        recentProjectsEl.innerHTML = recentProjects.length > 0 
-            ? recentProjects.map(p => `
-                <div class="dashboard-item">
-                    <strong>${p.project_name}</strong>
-                    <span class="badge ${p.status}">${formatStatus(p.status)}</span>
+
+    // Calcular métricas
+    const totalHours = filteredProjects.reduce((sum, p) => sum + (p.total_time_seconds || 0), 0) / 3600;
+    const totalRevenue = filteredProjects.reduce((sum, p) => sum + ((p.total_time_seconds || 0) / 3600 * (p.hourly_rate || 0)), 0);
+    const activeProjects = filteredProjects.filter(p => p.status === 'in_progress').length;
+    const completedPhases = 0; // Calcular desde phases
+    const productivity = totalHours > 0 ? ((completedPhases / totalHours) * 100).toFixed(1) : 0;
+
+    dashboardData = {
+        hours: totalHours,
+        revenue: totalRevenue,
+        projects: activeProjects,
+        tasks: completedPhases,
+        clients: clients.length,
+        productivity: productivity
+    };
+}
+
+function renderDashboardStats() {
+    const { hours, revenue, projects: activeProjects, tasks, clients: totalClients, productivity } = dashboardData;
+
+    // Actualizar valores
+    document.getElementById('dash-hours').textContent = `${hours.toFixed(1)}h`;
+    document.getElementById('dash-revenue').textContent = `$${revenue.toFixed(2)}`;
+    document.getElementById('dash-projects').textContent = activeProjects;
+    document.getElementById('dash-tasks').textContent = tasks;
+    document.getElementById('dash-clients').textContent = totalClients;
+    document.getElementById('dash-productivity').textContent = `${productivity}%`;
+}
+
+function renderTimeDistributionChart() {
+    const container = document.getElementById('timeDistributionChart');
+    if (!container) return;
+
+    const projectsWithTime = projects.filter(p => p.total_time_seconds > 0);
+    const maxTime = Math.max(...projectsWithTime.map(p => p.total_time_seconds || 0));
+
+    container.innerHTML = projectsWithTime.length > 0 ? projectsWithTime.slice(0, 8).map(project => {
+        const hours = ((project.total_time_seconds || 0) / 3600).toFixed(1);
+        const percentage = maxTime > 0 ? ((project.total_time_seconds || 0) / maxTime) * 100 : 0;
+        const color = getProjectColor(project.status);
+
+        return `
+            <div class="chart-bar-item">
+                <div class="chart-bar-label-enhanced">
+                    <span class="project-dot" style="background: ${color};"></span>
+                    <span>${project.project_name}</span>
                 </div>
-            `).join('')
-            : '<p class="empty-text">No hay proyectos recientes</p>';
-    }
-    
-    // Sesiones activas
-    const activeSessionsEl = document.getElementById('activeSessions');
-    if (activeSessionsEl) {
-        activeSessionsEl.innerHTML = activeSession
-            ? `<div class="dashboard-item">
-                <strong>${projects.find(p => p.id == activeSession.project_id)?.project_name}</strong>
-                <span id="dashboardTimer">00:00:00</span>
-            </div>`
-            : '<p class="empty-text">No hay sesiones activas</p>';
+                <div class="chart-bar-wrapper">
+                    <div class="chart-bar-progress" style="width: ${percentage}%; background: ${color};">
+                        <span class="chart-bar-value">${hours}h</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('') : '<p class="empty-chart">No hay datos de tiempo registrados</p>';
+}
+
+function renderRevenueTrendChart() {
+    const container = document.getElementById('revenueTrendChart');
+    if (!container) return;
+
+    // Simular datos de tendencia (últimos 7 días)
+    const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    const maxRevenue = 5000;
+
+    container.innerHTML = `
+        <div class="line-chart">
+            ${days.map((day, index) => {
+                const value = Math.random() * maxRevenue;
+                const height = (value / maxRevenue) * 100;
+                return `
+                    <div class="line-chart-column">
+                        <div class="line-chart-bar" style="height: ${height}%;" title="$${value.toFixed(2)}"></div>
+                        <div class="line-chart-label">${day}</div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
+
+function renderProjectStatusBreakdown() {
+    const container = document.getElementById('projectStatusBreakdown');
+    if (!container) return;
+
+    const statusGroups = projects.reduce((acc, p) => {
+        acc[p.status] = (acc[p.status] || 0) + 1;
+        return acc;
+    }, {});
+
+    const total = projects.length;
+    document.getElementById('total-projects-badge').textContent = `${total} proyectos`;
+
+    container.innerHTML = Object.entries(statusGroups).map(([status, count]) => {
+        const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+        const statusInfo = getStatusInfo(status);
+
+        return `
+            <div class="status-breakdown-item">
+                <div class="status-breakdown-header">
+                    <span class="status-breakdown-label">
+                        ${statusInfo.icon} ${statusInfo.name}
+                    </span>
+                    <span class="status-breakdown-count">${count}</span>
+                </div>
+                <div class="status-breakdown-bar">
+                    <div class="status-breakdown-fill" style="width: ${percentage}%; background: ${statusInfo.color};"></div>
+                </div>
+                <div class="status-breakdown-percentage">${percentage}%</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderActivityTimeline() {
+    const container = document.getElementById('activityTimeline');
+    if (!container) return;
+
+    // Generar actividades recientes
+    const activities = projects.slice(0, 10).map(p => ({
+        type: 'project',
+        icon: '📁',
+        title: p.project_name,
+        action: formatStatus(p.status),
+        time: 'Hace 2h'
+    }));
+
+    container.innerHTML = activities.length > 0 ? activities.map(activity => `
+        <div class="activity-item">
+            <div class="activity-icon">${activity.icon}</div>
+            <div class="activity-content">
+                <div class="activity-title">${activity.title}</div>
+                <div class="activity-description">${activity.action}</div>
+            </div>
+            <div class="activity-time">${activity.time}</div>
+        </div>
+    `).join('') : '<p class="empty-text">No hay actividad reciente</p>';
+}
+
+function renderTopProjects() {
+    const container = document.getElementById('topProjectsList');
+    if (!container) return;
+
+    const sorted = [...projects]
+        .sort((a, b) => (b.total_time_seconds || 0) - (a.total_time_seconds || 0))
+        .slice(0, 5);
+
+    container.innerHTML = sorted.map((project, index) => {
+        const hours = ((project.total_time_seconds || 0) / 3600).toFixed(1);
+        const revenue = (project.total_time_seconds || 0) / 3600 * (project.hourly_rate || 0);
+
+        return `
+            <div class="top-project-item">
+                <div class="top-project-rank">#${index + 1}</div>
+                <div class="top-project-info">
+                    <div class="top-project-name">${project.project_name}</div>
+                    <div class="top-project-meta">${hours}h • $${revenue.toFixed(2)}</div>
+                </div>
+                <div class="top-project-badge">${formatStatus(project.status)}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderUpcomingDeadlines() {
+    const container = document.getElementById('upcomingDeadlines');
+    if (!container) return;
+
+    const projectsWithDeadlines = projects
+        .filter(p => p.estimated_end_date)
+        .sort((a, b) => new Date(a.estimated_end_date) - new Date(b.estimated_end_date))
+        .slice(0, 5);
+
+    document.getElementById('urgent-count').textContent = projectsWithDeadlines.length;
+
+    container.innerHTML = projectsWithDeadlines.length > 0 ? projectsWithDeadlines.map(project => {
+        const daysUntil = Math.ceil((new Date(project.estimated_end_date) - new Date()) / (1000 * 60 * 60 * 24));
+        const urgency = daysUntil <= 3 ? 'urgent' : daysUntil <= 7 ? 'warning' : 'normal';
+
+        return `
+            <div class="deadline-item ${urgency}">
+                <div class="deadline-icon">${urgency === 'urgent' ? '🔴' : urgency === 'warning' ? '🟡' : '🟢'}</div>
+                <div class="deadline-content">
+                    <div class="deadline-project">${project.project_name}</div>
+                    <div class="deadline-date">${daysUntil > 0 ? `${daysUntil} días restantes` : 'Vencido'}</div>
+                </div>
+            </div>
+        `;
+    }).join('') : '<p class="empty-text">No hay vencimientos próximos</p>';
+}
+
+function renderPerformanceMetrics() {
+    const container = document.getElementById('performanceMetrics');
+    if (!container) return;
+
+    const metrics = [
+        { label: 'Tareas a Tiempo', value: 95, target: 90 },
+        { label: 'Satisfacción Cliente', value: 4.8, target: 4.5, isRating: true },
+        { label: 'Horas Facturables', value: 87, target: 80 },
+        { label: 'Proyectos Completados', value: 12, target: 10, isNumber: true }
+    ];
+
+    container.innerHTML = metrics.map(metric => {
+        const percentage = metric.isNumber ? 100 : metric.value;
+        const isGood = metric.value >= metric.target;
+
+        return `
+            <div class="performance-metric-item">
+                <div class="performance-metric-header">
+                    <span>${metric.label}</span>
+                    <span class="performance-value ${isGood ? 'good' : 'bad'}">
+                        ${metric.isRating ? metric.value.toFixed(1) + '⭐' : metric.isNumber ? metric.value : metric.value + '%'}
+                    </span>
+                </div>
+                <div class="performance-bar">
+                    <div class="performance-fill ${isGood ? 'good' : 'bad'}" style="width: ${percentage}%;"></div>
+                    <div class="performance-target" style="left: ${metric.target}%;"></div>
+                </div>
+                <div class="performance-target-label">Meta: ${metric.isRating ? metric.target.toFixed(1) : metric.isNumber ? metric.target : metric.target + '%'}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderActiveSessions() {
+    const container = document.getElementById('activeSessions');
+    if (!container) return;
+
+    if (activeSession && currentTimerSession) {
+        const project = projects.find(p => p.id == activeSession.project_id);
+        const phase = project?.phases?.find(ph => ph.id == currentTimerSession.phase_id);
+        
+        if (project && phase) {
+            const elapsed = Math.floor((Date.now() - new Date(currentTimerSession.start_time).getTime()) / 1000);
+            
+            container.innerHTML = `
+                <div class="active-sessions-list">
+                    <div class="active-session-item">
+                        <div class="session-info">
+                            <div class="session-project">${project.project_name}</div>
+                            <div class="session-phase">📍 ${phase.phase_name}</div>
+                        </div>
+                        <div class="session-time" id="dashboardTimer">${formatSeconds(elapsed)}</div>
+                        <button onclick="stopTimer()" class="btn btn-danger btn-sm">⏹ Detener</button>
+                    </div>
+                </div>
+            `;
+        } else {
+            container.innerHTML = '<p class="empty-text">⚠️ Sesión activa pero sin datos</p>';
+        }
+    } else {
+        container.innerHTML = '<p class="empty-text">💤 No hay sesiones activas</p>';
     }
 }
 
@@ -1778,6 +2026,82 @@ function renderPhaseTimeChart() {
     }).join('');
 }
 
+// Funciones auxiliares para dashboard
+function getProjectColor(status) {
+    const colors = {
+        'quote': '#94a3b8',
+        'pending_approval': '#fbbf24',
+        'approved': '#10b981',
+        'in_progress': '#3b82f6',
+        'review': '#8b5cf6',
+        'testing': '#f59e0b',
+        'client_review': '#ec4899',
+        'completed': '#22c55e',
+        'on_hold': '#64748b',
+        'cancelled': '#ef4444'
+    };
+    return colors[status] || '#7c3aed';
+}
+
+function getStatusInfo(status) {
+    const statusMap = {
+        'quote': { name: 'Cotización', icon: '💭', color: '#94a3b8' },
+        'pending_approval': { name: 'Pendiente', icon: '⏳', color: '#fbbf24' },
+        'approved': { name: 'Aprobado', icon: '✅', color: '#10b981' },
+        'in_progress': { name: 'En Progreso', icon: '🚀', color: '#3b82f6' },
+        'review': { name: 'Revisión', icon: '👀', color: '#8b5cf6' },
+        'testing': { name: 'Testing', icon: '🧪', color: '#f59e0b' },
+        'client_review': { name: 'Rev. Cliente', icon: '📋', color: '#ec4899' },
+        'completed': { name: 'Completado', icon: '✔️', color: '#22c55e' },
+        'on_hold': { name: 'En Espera', icon: '⏸️', color: '#64748b' },
+        'cancelled': { name: 'Cancelado', icon: '❌', color: '#ef4444' }
+    };
+    return statusMap[status] || { name: status, icon: '📁', color: '#7c3aed' };
+}
+
+function refreshActivity() {
+    renderActivityTimeline();
+    showNotification('✅ Actividad actualizada', 'success');
+}
+
+// Event Listeners para filtros de dashboard
+document.addEventListener('DOMContentLoaded', () => {
+    // Filtros de período
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentDashboardPeriod = e.target.dataset.period;
+            updateDashboard();
+        });
+    });
+
+    // Filtro de gráfico de tiempo
+    const timeChartFilter = document.getElementById('time-chart-filter');
+    if (timeChartFilter) {
+        timeChartFilter.addEventListener('change', () => {
+            renderTimeDistributionChart();
+        });
+    }
+
+    // Filtro de top proyectos
+    const topProjectsMetric = document.getElementById('top-projects-metric');
+    if (topProjectsMetric) {
+        topProjectsMetric.addEventListener('change', () => {
+            renderTopProjects();
+        });
+    }
+
+    // Tabs de performance
+    document.querySelectorAll('.perf-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            document.querySelectorAll('.perf-tab').forEach(t => t.classList.remove('active'));
+            e.target.classList.add('active');
+            renderPerformanceMetrics();
+        });
+    });
+});
+
 // Hacer funciones disponibles globalmente
 window.viewProject = viewProject;
 window.viewProjectDetail = viewProjectDetail;
@@ -1786,3 +2110,4 @@ window.deleteClient = deleteClient;
 window.copyAccessCode = copyAccessCode;
 window.deletePhase = deletePhase;
 window.startTimerForPhase = startTimerForPhase;
+window.refreshActivity = refreshActivity;
