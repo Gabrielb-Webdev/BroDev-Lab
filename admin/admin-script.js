@@ -1127,28 +1127,51 @@ async function checkActiveTimerSession() {
         });
         const data = await response.json();
         
-        if (data.success && data.data) {
+        if (data.success && data.data && data.data.elapsed_seconds !== undefined) {
             currentTimerSession = data.data;
-            startTimerDisplay(data.data.elapsed_seconds);
-            document.getElementById('timerStatus').textContent = '🟢 En ejecución';
-            document.getElementById('startTimerBtn').style.display = 'none';
-            document.getElementById('stopTimerBtn').style.display = 'block';
+            const elapsed = parseInt(data.data.elapsed_seconds) || 0;
+            
+            const statusEl = document.getElementById('timerStatus');
+            const startBtnEl = document.getElementById('startTimerBtn');
+            const stopBtnEl = document.getElementById('stopTimerBtn');
+            
+            if (statusEl) statusEl.textContent = '🟢 En ejecución';
+            if (startBtnEl) startBtnEl.style.display = 'none';
+            if (stopBtnEl) stopBtnEl.style.display = 'block';
+            
+            startTimerDisplay(elapsed);
         } else {
             stopTimerDisplay();
         }
     } catch (error) {
         console.error('Error verificando timer:', error);
+        stopTimerDisplay();
     }
 }
 
 function startTimerDisplay(elapsedSeconds = 0) {
-    timerStartTime = Date.now() - (elapsedSeconds * 1000);
+    // Asegurar que elapsedSeconds sea un número válido
+    const validElapsed = Math.max(0, parseInt(elapsedSeconds) || 0);
+    timerStartTime = Date.now() - (validElapsed * 1000);
     
     if (projectTimerInterval) clearInterval(projectTimerInterval);
     
+    // Actualizar inmediatamente antes de iniciar el intervalo
+    const timerDisplayEl = document.getElementById('timerDisplay');
+    if (timerDisplayEl) {
+        timerDisplayEl.textContent = formatSeconds(validElapsed);
+    }
+    
     projectTimerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - timerStartTime) / 1000);
-        document.getElementById('timerDisplay').textContent = formatSeconds(elapsed);
+        if (!timerStartTime) {
+            clearInterval(projectTimerInterval);
+            return;
+        }
+        const elapsed = Math.max(0, Math.floor((Date.now() - timerStartTime) / 1000));
+        const timerEl = document.getElementById('timerDisplay');
+        if (timerEl) {
+            timerEl.textContent = formatSeconds(elapsed);
+        }
     }, 1000);
 }
 
@@ -1157,10 +1180,18 @@ function stopTimerDisplay() {
         clearInterval(projectTimerInterval);
         projectTimerInterval = null;
     }
-    document.getElementById('timerDisplay').textContent = '00:00:00';
-    document.getElementById('timerStatus').textContent = 'Detenido';
-    document.getElementById('startTimerBtn').style.display = 'block';
-    document.getElementById('stopTimerBtn').style.display = 'none';
+    timerStartTime = null;
+    
+    const timerDisplayEl = document.getElementById('timerDisplay');
+    const timerStatusEl = document.getElementById('timerStatus');
+    const startBtnEl = document.getElementById('startTimerBtn');
+    const stopBtnEl = document.getElementById('stopTimerBtn');
+    
+    if (timerDisplayEl) timerDisplayEl.textContent = '00:00:00';
+    if (timerStatusEl) timerStatusEl.textContent = 'Detenido';
+    if (startBtnEl) startBtnEl.style.display = 'block';
+    if (stopBtnEl) stopBtnEl.style.display = 'none';
+    
     currentTimerSession = null;
 }
 
