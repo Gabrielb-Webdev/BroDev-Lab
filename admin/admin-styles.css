@@ -1569,7 +1569,7 @@ select.form-control option:last-child {
     font-weight: 700;
     background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-text-fill-color: #ffffff;
     background-clip: text;
     margin-bottom: 8px;
 }
