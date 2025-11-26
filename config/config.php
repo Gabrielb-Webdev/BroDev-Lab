@@ -28,7 +28,7 @@ define('SESSION_LIFETIME', 3600); // 1 hora
 define('ADMIN_SESSION_LIFETIME', 7200); // 2 horas
 
 // Configuración de Timezone
-date_default_timezone_set('America/Mexico_City'); // Ajustar a tu zona horaria
+date_default_timezone_set('America/Argentina/Buenos_Aires'); // Zona horaria de Argentina
 
 // Mostrar errores (cambiar a false en producción)
 define('DEBUG_MODE', false);
@@ -50,7 +50,12 @@ function getDBConnection() {
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => false,
         ];
-        return new PDO($dsn, DB_USER, DB_PASS, $options);
+        $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+        
+        // Configurar zona horaria de MySQL a Argentina
+        $pdo->exec("SET time_zone = '-03:00'");
+        
+        return $pdo;
     } catch (PDOException $e) {
         if (DEBUG_MODE) {
             die("Error de conexión: " . $e->getMessage());

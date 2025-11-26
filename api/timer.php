@@ -65,11 +65,15 @@ function getActiveSession($db) {
         $session = $stmt->fetch();
         
         if ($session) {
-            // Calcular tiempo transcurrido
-            $start = new DateTime($session['start_time']);
-            $now = new DateTime();
-            $elapsed = $now->getTimestamp() - $start->getTimestamp();
+            // Calcular tiempo transcurrido usando zona horaria de Argentina
+            $timezone = new DateTimeZone('America/Argentina/Buenos_Aires');
+            $start = new DateTime($session['start_time'], $timezone);
+            $now = new DateTime('now', $timezone);
+            $elapsed = max(0, $now->getTimestamp() - $start->getTimestamp());
             $session['elapsed_seconds'] = $elapsed;
+            
+            // Log para debug
+            error_log("Active session - Start: {$session['start_time']}, Now: {$now->format('Y-m-d H:i:s')}, Elapsed: {$elapsed}s");
         }
         
         sendJsonResponse([
@@ -98,20 +102,29 @@ function startTimer($db) {
             return;
         }
         
-        // Crear nueva sesión
+        // Obtener hora actual de Argentina
+        $timezone = new DateTimeZone('America/Argentina/Buenos_Aires');
+        $now = new DateTime('now', $timezone);
+        $startTimeStr = $now->format('Y-m-d H:i:s');
+        
+        // Crear nueva sesión con hora explícita de Argentina
         $stmt = $db->prepare("
             INSERT INTO time_sessions 
             (project_id, phase_id, session_description, start_time, is_active)
-            VALUES (?, ?, ?, NOW(), 1)
+            VALUES (?, ?, ?, ?, 1)
         ");
         
         $stmt->execute([
             $data['project_id'],
             $data['phase_id'] ?? null,
-            $data['description'] ?? ''
+            $data['description'] ?? '',
+            $startTimeStr
         ]);
         
         $sessionId = $db->lastInsertId();
+        
+        // Log para debug
+        error_log("Timer started - Session ID: {$sessionId}, Start time: {$startTimeStr}");
         
         // Actualizar estado de la fase si existe
         if (!empty($data['phase_id'])) {
@@ -154,20 +167,29 @@ function stopTimer($db) {
             return;
         }
         
-        // Calcular duración en segundos (asegurar que sea un número positivo)
-        $start = new DateTime($session['start_time']);
-        $end = new DateTime();
-        $duration = max(0, $end->getTimestamp() - $start->getTimestamp());
+        // Asegurar que usamos la misma zona horaria
+        $timezone = new DateTimeZone('America/Argentina/Buenos_Aires');
+        $start = new DateTime($session['start_time'], $timezone);
+        $end = new DateTime('now', $timezone);
         
-        // Validar que la duración sea razonable (no más de 24 horas)
-        if ($duration > 86400) {
+        // Calcular duración en segundos
+        $duration = $end->getTimestamp() - $start->getTimestamp();
+        
+        // Asegurar que la duración sea positiva y razonable
+        if ($duration < 0) {
+            $duration = 0;
+        } elseif ($duration > 86400) {
             $duration = 86400; // Máximo 24 horas
         }
         
-        // Actualizar sesión
+        // Log para debug (opcional)
+        error_log("Timer stopped - Start: {$session['start_time']}, End: {$end->format('Y-m-d H:i:s')}, Duration: {$duration}s");
+        
+        // Actualizar sesión con la hora actual de Argentina
+        $endTimeStr = $end->format('Y-m-d H:i:s');
         $stmt = $db->prepare("
             UPDATE time_sessions 
-            SET end_time = NOW(), 
+            SET end_time = ?, 
                 duration_seconds = ?,
                 is_active = 0,
                 notes = ?
@@ -175,6 +197,7 @@ function stopTimer($db) {
         ");
         
         $stmt->execute([
+            $endTimeStr,
             intval($duration),
             $data['notes'] ?? null,
             $session['id']
