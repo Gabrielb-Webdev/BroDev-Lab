@@ -183,8 +183,12 @@
     display: none;
 }
 
-.admin-view.active {
+.admin-view.active,
+#dashboardView {
     display: block;
+}
+
+.admin-view.active {
     animation: fadeIn 0.3s ease;
 }
 
