@@ -286,12 +286,14 @@ async function createProject(formData) {
 }
 
 async function deleteProject(id) {
-    if (!confirm('¿Estás seguro de eliminar este proyecto?')) return;
+    if (!confirm('¿Estás seguro de eliminar este proyecto? Esta acción no se puede deshacer.')) return;
     
     try {
-        const response = await fetch(`${API_BASE}/projects.php?id=${id}`, {
+        const response = await fetch(`${API_BASE}/projects.php`, {
             method: 'DELETE',
-            credentials: 'include'
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ id: id })
         });
         
         const data = await response.json();
