@@ -35,23 +35,32 @@ try {
 }
 
 // Configurar cookies de sesión antes de iniciar
+$isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443;
+
 if (PHP_VERSION_ID >= 70300) {
     session_set_cookie_params([
-        'lifetime' => 0,
+        'lifetime' => 86400, // 24 horas en lugar de 0
         'path' => '/',
         'domain' => '',
-        'secure' => true,
+        'secure' => $isSecure, // Adaptativo según el protocolo
         'httponly' => true,
         'samesite' => 'Lax'
     ]);
 } else {
     ini_set('session.cookie_httponly', 1);
-    ini_set('session.cookie_secure', 1);
+    ini_set('session.cookie_secure', $isSecure ? 1 : 0);
     ini_set('session.use_only_cookies', 1);
+    ini_set('session.cookie_lifetime', 86400);
 }
 
 // Iniciar sesión PHP
 session_start();
+
+// Regenerar ID de sesión si es una nueva sesión para evitar session fixation
+if (!isset($_SESSION['initialized'])) {
+    session_regenerate_id(true);
+    $_SESSION['initialized'] = true;
+}
 
 setCorsHeaders();
 
@@ -176,6 +185,10 @@ function loginAdmin($db, $username, $password) {
         $_SESSION['full_name'] = $user['full_name'];
         $_SESSION['role'] = $user['role'];
         $_SESSION['session_token'] = $sessionToken;
+        $_SESSION['last_activity'] = time();
+        
+        // Regenerar ID de sesión por seguridad después del login
+        session_regenerate_id(true);
         
         sendJsonResponse([
             'success' => true,
@@ -339,6 +352,9 @@ function verifySession($db) {
             sendJsonResponse(['authenticated' => false], 200);
             return;
         }
+        
+        // Actualizar última actividad
+        $_SESSION['last_activity'] = time();
         
         sendJsonResponse([
             'authenticated' => true,

@@ -319,7 +319,9 @@
         // Verificar si ya está autenticado
         window.addEventListener('DOMContentLoaded', async () => {
             try {
-                const response = await fetch(`${API_BASE}/auth.php?action=verify`);
+                const response = await fetch(`${API_BASE}/auth.php?action=verify`, {
+                    credentials: 'include' // Incluir cookies
+                });
                 const data = await response.json();
                 
                 if (data.authenticated && data.user_type === 'admin') {
