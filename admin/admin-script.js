@@ -74,8 +74,17 @@ async function loadCurrentUser() {
         
         if (data.success) {
             const user = data.data;
+            // Actualizar nombre del usuario
             document.getElementById('adminName').textContent = user.full_name || user.username;
             
+            // Actualizar rol del usuario
+            const roleElement = document.querySelector('.admin-user-role');
+            if (roleElement) {
+                const roleText = user.role === 'super_admin' ? 'Super Administrador' : 'Administrador';
+                roleElement.textContent = roleText;
+            }
+            
+            // Actualizar avatar con iniciales
             const initials = user.full_name 
                 ? user.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
                 : user.username.substring(0, 2).toUpperCase();

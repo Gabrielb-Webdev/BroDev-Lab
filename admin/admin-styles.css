@@ -104,12 +104,41 @@
 .admin-user {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
+    padding: 8px 16px;
+    background: rgba(124, 58, 237, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    transition: all 0.3s ease;
+}
+
+.admin-user:hover {
+    background: rgba(124, 58, 237, 0.1);
+    border-color: rgba(124, 58, 237, 0.25);
+}
+
+.admin-user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.admin-user-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.admin-user-role {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
 }
 
 .admin-avatar {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
     display: flex;
@@ -117,6 +146,8 @@
     justify-content: center;
     color: white;
     font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
 }
 
 .admin-title {
@@ -310,6 +341,39 @@
 
 .btn-danger:hover {
     background: rgba(239, 68, 68, 0.2);
+}
+
+.btn-action {
+    padding: 14px 28px;
+    border-radius: 14px;
+    border: 2px solid transparent;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+}
+
+.btn-action:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(124, 58, 237, 0.4);
+    filter: brightness(1.1);
+}
+
+.btn-action:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+.btn-action .btn-icon {
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* ============================================
@@ -615,9 +679,18 @@
    VIEW HEADER
    ============================================ */
 .view-header {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+}
+
+.view-header h2 {
+    flex: 1;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
 /* ============================================

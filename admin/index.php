@@ -55,7 +55,10 @@
         <header class="admin-header">
             <h1 id="pageTitle">Dashboard</h1>
             <div class="admin-user">
-                <span id="adminName">Gabriel Dev</span>
+                <div class="admin-user-info">
+                    <span id="adminName" class="admin-user-name">Cargando...</span>
+                    <span class="admin-user-role">Administrador</span>
+                </div>
                 <div class="admin-avatar">GD</div>
             </div>
         </header>
@@ -108,7 +111,11 @@
         <!-- Projects View -->
         <div id="projectsView" class="admin-view" style="display: none;">
             <div class="view-header">
-                <button id="newProjectBtn" class="btn-primary">+ Nuevo Proyecto</button>
+                <h2>Gestión de Proyectos</h2>
+                <button id="newProjectBtn" class="btn-action">
+                    <span class="btn-icon">📁</span>
+                    <span>Nuevo Proyecto</span>
+                </button>
             </div>
             <div id="projectsList" class="data-table"></div>
         </div>
@@ -116,7 +123,11 @@
         <!-- Clients View -->
         <div id="clientsView" class="admin-view" style="display: none;">
             <div class="view-header">
-                <button id="newClientBtn" class="btn-primary">+ Nuevo Cliente</button>
+                <h2>Gestión de Clientes</h2>
+                <button id="newClientBtn" class="btn-action">
+                    <span class="btn-icon">👥</span>
+                    <span>Nuevo Cliente</span>
+                </button>
             </div>
             <div id="clientsList" class="data-table"></div>
         </div>
