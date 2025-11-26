@@ -1008,7 +1008,7 @@ function renderPhasesList() {
                 <p>Agrega fases para organizar mejor tu proyecto</p>
             </div>
         `;
-        timerPhaseSelect.innerHTML = '<option value="">Sin fase específica</option>';
+        timerPhaseSelect.innerHTML = '<option value="" disabled selected>Seleccionar fase...</option>';
         return;
     }
     
@@ -1056,7 +1056,7 @@ function renderPhasesList() {
     `).join('');
     
     // Llenar select de fases para timer
-    timerPhaseSelect.innerHTML = '<option value="">Sin fase específica</option>' +
+    timerPhaseSelect.innerHTML = '<option value="" disabled selected>Seleccionar fase...</option>' +
         currentPhases.map(phase => `<option value="${phase.id}">${phase.phase_name}</option>`).join('');
 }
 

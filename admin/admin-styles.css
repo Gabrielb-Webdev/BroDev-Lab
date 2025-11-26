@@ -758,6 +758,35 @@
     box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
 }
 
+/* Estilos específicos para select del timer */
+select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237c3aed' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+select.form-control:hover {
+    border-color: rgba(124, 58, 237, 0.4);
+    background-color: rgba(124, 58, 237, 0.05);
+}
+
+select.form-control option {
+    padding: 12px;
+    background: var(--card-background);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+select.form-control option:disabled {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
 .btn-success {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
