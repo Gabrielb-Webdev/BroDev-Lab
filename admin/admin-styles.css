@@ -1196,6 +1196,29 @@
 .phase-status-badge.paused { background: rgba(251,191,36,0.2); color: #fbbf24; }
 .phase-status-badge.blocked { background: rgba(239,68,68,0.2); color: #ef4444; }
 
+.phase-status-select {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.phase-status-select:hover {
+    background: rgba(124, 58, 237, 0.2);
+    border-color: rgba(124, 58, 237, 0.3);
+}
+
+.phase-status-select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
 .phase-details {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));

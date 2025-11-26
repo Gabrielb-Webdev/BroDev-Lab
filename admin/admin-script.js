@@ -1021,7 +1021,13 @@ function renderPhasesList() {
                     <div class="phase-name">${phase.phase_name}</div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <span class="phase-status-badge ${phase.status}">${formatPhaseStatus(phase.status)}</span>
+                    <select class="phase-status-select" onchange="updatePhaseStatus(${phase.id}, this.value)">
+                        <option value="not_started" ${phase.status === 'not_started' ? 'selected' : ''}>⚪ No Iniciada</option>
+                        <option value="in_progress" ${phase.status === 'in_progress' ? 'selected' : ''}>🏃 En Progreso</option>
+                        <option value="paused" ${phase.status === 'paused' ? 'selected' : ''}>⏸️ Pausada</option>
+                        <option value="completed" ${phase.status === 'completed' ? 'selected' : ''}>✅ Completada</option>
+                        <option value="blocked" ${phase.status === 'blocked' ? 'selected' : ''}>🚫 Bloqueada</option>
+                    </select>
                     <div class="phase-actions">
                         <button class="btn-icon-only btn-play" onclick="startTimerForPhase(${phase.id})" title="Iniciar timer">▶️</button>
                         <button class="btn-icon-only btn-edit" onclick="editPhase(${phase.id})" title="Editar">✏️</button>
@@ -1102,6 +1108,33 @@ document.getElementById('phaseForm')?.addEventListener('submit', async (e) => {
         showNotification('Error al crear fase', 'error');
     }
 });
+
+async function updatePhaseStatus(phaseId, newStatus) {
+    try {
+        const response = await fetch(`${API_BASE}/phases.php`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                id: phaseId,
+                status: newStatus
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('✅ Estado actualizado', 'success');
+            await loadProjectPhases(currentProjectDetail.id);
+            renderPhasesList();
+        } else {
+            showNotification('Error al actualizar estado', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al actualizar estado', 'error');
+    }
+}
 
 async function editPhase(phaseId) {
     const phase = currentPhases.find(p => p.id === phaseId);
