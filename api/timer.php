@@ -154,10 +154,15 @@ function stopTimer($db) {
             return;
         }
         
-        // Calcular duración
+        // Calcular duración en segundos (asegurar que sea un número positivo)
         $start = new DateTime($session['start_time']);
         $end = new DateTime();
-        $duration = $end->getTimestamp() - $start->getTimestamp();
+        $duration = max(0, $end->getTimestamp() - $start->getTimestamp());
+        
+        // Validar que la duración sea razonable (no más de 24 horas)
+        if ($duration > 86400) {
+            $duration = 86400; // Máximo 24 horas
+        }
         
         // Actualizar sesión
         $stmt = $db->prepare("
@@ -170,7 +175,7 @@ function stopTimer($db) {
         ");
         
         $stmt->execute([
-            $duration,
+            intval($duration),
             $data['notes'] ?? null,
             $session['id']
         ]);

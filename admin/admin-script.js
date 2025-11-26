@@ -798,9 +798,13 @@ function startAutoRefresh() {
 // UTILIDADES
 // ============================================
 function formatSeconds(seconds) {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
+    // Validar y convertir a número válido
+    const validSeconds = Math.max(0, parseInt(seconds) || 0);
+    
+    const h = Math.floor(validSeconds / 3600);
+    const m = Math.floor((validSeconds % 3600) / 60);
+    const s = Math.floor(validSeconds % 60);
+    
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
@@ -1516,24 +1520,29 @@ function renderTimerHistory(sessions) {
         return;
     }
     
-    container.innerHTML = sessions.map(session => `
-        <div class="timer-session-item">
-            <div class="session-info">
-                <h4>${session.phase_name || 'Sin fase'}</h4>
-                <p>${new Date(session.start_time).toLocaleDateString()} - ${session.session_description || 'Sin descripción'}</p>
-                ${session.notes ? `<p style="font-style: italic;">${session.notes}</p>` : ''}
+    container.innerHTML = sessions.map(session => {
+        // Asegurar que duration_seconds sea un número válido
+        const duration = parseInt(session.duration_seconds) || 0;
+        
+        return `
+            <div class="timer-session-item">
+                <div class="session-info">
+                    <h4>${session.phase_name || 'Sin fase'}</h4>
+                    <p>${new Date(session.start_time).toLocaleDateString()} - ${session.session_description || 'Sin descripción'}</p>
+                    ${session.notes ? `<p style="font-style: italic;">${session.notes}</p>` : ''}
+                </div>
+                <div class="session-actions">
+                    <span class="session-duration">${formatSeconds(duration)}</span>
+                    <button class="btn-icon-small" onclick="editTimerSession(${session.id}, ${duration})" title="Editar tiempo">
+                        ✏️
+                    </button>
+                    <button class="btn-icon-small btn-danger-small" onclick="deleteTimerSession(${session.id})" title="Eliminar sesión">
+                        🗑️
+                    </button>
+                </div>
             </div>
-            <div class="session-actions">
-                <span class="session-duration">${formatSeconds(session.duration_seconds)}</span>
-                <button class="btn-icon-small" onclick="editTimerSession(${session.id}, ${session.duration_seconds})" title="Editar tiempo">
-                    ✏️
-                </button>
-                <button class="btn-icon-small btn-danger-small" onclick="deleteTimerSession(${session.id})" title="Eliminar sesión">
-                    🗑️
-                </button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 async function editTimerSession(sessionId, currentDuration) {
