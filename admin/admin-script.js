@@ -29,6 +29,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadInitialData();
     setupEventListeners();
     startAutoRefresh();
+    
+    // Verificar si hay un timer activo globalmente
+    await checkGlobalActiveTimer();
 });
 
 // ============================================
@@ -1120,7 +1123,7 @@ async function deletePhase(phaseId) {
 // ============================================
 // SISTEMA DE TIMER
 // ============================================
-async function checkActiveTimerSession() {
+async function checkGlobalActiveTimer() {
     try {
         const response = await fetch(`${API_BASE}/timer.php?action=active`, {
             credentials: 'include'
@@ -1128,7 +1131,27 @@ async function checkActiveTimerSession() {
         const data = await response.json();
         
         if (data.success && data.data && data.data.elapsed_seconds !== undefined) {
+            // Hay un timer activo, guardar en estado global
             currentTimerSession = data.data;
+            console.log('⏱️ Timer activo detectado:', data.data.project_name);
+        }
+    } catch (error) {
+        console.error('Error verificando timer global:', error);
+    }
+}
+
+async function checkActiveTimerSession() {
+    try {
+        // SIEMPRE consultar el servidor para obtener el tiempo real actualizado
+        const response = await fetch(`${API_BASE}/timer.php?action=active`, {
+            credentials: 'include',
+            cache: 'no-cache' // Importante: no usar cache
+        });
+        const data = await response.json();
+        
+        if (data.success && data.data && data.data.elapsed_seconds !== undefined) {
+            currentTimerSession = data.data;
+            // El servidor ya calculó el elapsed_seconds real desde start_time
             const elapsed = parseInt(data.data.elapsed_seconds) || 0;
             
             const statusEl = document.getElementById('timerStatus');
@@ -1139,6 +1162,7 @@ async function checkActiveTimerSession() {
             if (startBtnEl) startBtnEl.style.display = 'none';
             if (stopBtnEl) stopBtnEl.style.display = 'block';
             
+            // Iniciar el timer con el tiempo real desde la BD
             startTimerDisplay(elapsed);
         } else {
             stopTimerDisplay();
