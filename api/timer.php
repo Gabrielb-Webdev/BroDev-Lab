@@ -31,6 +31,8 @@ switch ($method) {
             stopTimer($db);
         } elseif ($action === 'pause') {
             pauseTimer($db);
+        } elseif ($action === 'adjust') {
+            adjustTimer($db);
         }
         break;
         
@@ -243,6 +245,49 @@ function getTimerHistory($db, $projectId = null, $phaseId = null) {
         sendJsonResponse([
             'success' => true,
             'data' => $sessions
+        ]);
+        
+    } catch (PDOException $e) {
+        sendJsonResponse(['error' => $e->getMessage()], 500);
+    }
+}
+
+function adjustTimer($db) {
+    try {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($data['session_id']) || !isset($data['elapsed_seconds'])) {
+            sendJsonResponse(['error' => 'session_id y elapsed_seconds son requeridos'], 400);
+            return;
+        }
+        
+        $sessionId = $data['session_id'];
+        $elapsedSeconds = intval($data['elapsed_seconds']);
+        
+        // Verificar que la sesión existe y está activa
+        $stmt = $db->prepare("SELECT * FROM time_sessions WHERE id = ? AND is_active = 1");
+        $stmt->execute([$sessionId]);
+        $session = $stmt->fetch();
+        
+        if (!$session) {
+            sendJsonResponse(['error' => 'Sesión no encontrada o no está activa'], 404);
+            return;
+        }
+        
+        // Calcular el nuevo start_time basado en el tiempo ajustado
+        // Si queremos que elapsed_seconds sea X, entonces start_time debe ser NOW - X
+        $stmt = $db->prepare("
+            UPDATE time_sessions 
+            SET start_time = DATE_SUB(NOW(), INTERVAL ? SECOND)
+            WHERE id = ?
+        ");
+        
+        $stmt->execute([$elapsedSeconds, $sessionId]);
+        
+        sendJsonResponse([
+            'success' => true,
+            'message' => 'Tiempo ajustado correctamente',
+            'elapsed_seconds' => $elapsedSeconds
         ]);
         
     } catch (PDOException $e) {

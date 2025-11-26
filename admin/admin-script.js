@@ -867,6 +867,7 @@ function showNotification(message, type = 'info') {
 let currentProjectDetail = null;
 let currentPhases = [];
 let projectTimerInterval = null;
+let timerSyncInterval = null;
 let timerStartTime = null;
 let currentTimerSession = null;
 
@@ -1179,12 +1180,18 @@ function startTimerDisplay(elapsedSeconds = 0) {
     // Guardar el tiempo de inicio en el cliente basado en el servidor
     timerStartTime = Date.now() - (validElapsed * 1000);
     
+    // Limpiar intervalos existentes
     if (projectTimerInterval) clearInterval(projectTimerInterval);
+    if (timerSyncInterval) clearInterval(timerSyncInterval);
     
     // Actualizar inmediatamente antes de iniciar el intervalo
     const timerDisplayEl = document.getElementById('timerDisplay');
     if (timerDisplayEl) {
         timerDisplayEl.textContent = formatSeconds(validElapsed);
+        // Hacer el timer clickeable para edición manual
+        timerDisplayEl.style.cursor = 'pointer';
+        timerDisplayEl.title = 'Clic para editar tiempo manualmente';
+        timerDisplayEl.onclick = () => editTimerManually();
     }
     
     // Actualizar cada segundo
@@ -1201,8 +1208,8 @@ function startTimerDisplay(elapsedSeconds = 0) {
         }
     }, 1000);
     
-    // Sincronizar con el servidor cada 30 segundos para corregir cualquier drift
-    setInterval(async () => {
+    // Sincronizar con el servidor cada 10 segundos para corregir cualquier drift
+    timerSyncInterval = setInterval(async () => {
         if (currentTimerSession) {
             try {
                 const response = await fetch(`${API_BASE}/timer.php?action=active`, {
@@ -1219,13 +1226,17 @@ function startTimerDisplay(elapsedSeconds = 0) {
                 console.error('Error sincronizando timer:', error);
             }
         }
-    }, 30000);
+    }, 10000); // Cada 10 segundos
 }
 
 function stopTimerDisplay() {
     if (projectTimerInterval) {
         clearInterval(projectTimerInterval);
         projectTimerInterval = null;
+    }
+    if (timerSyncInterval) {
+        clearInterval(timerSyncInterval);
+        timerSyncInterval = null;
     }
     timerStartTime = null;
     
@@ -1317,6 +1328,65 @@ document.getElementById('stopTimerBtn')?.addEventListener('click', async () => {
         showNotification('Error al detener timer', 'error');
     }
 });
+
+async function editTimerManually() {
+    if (!currentTimerSession) {
+        showNotification('No hay timer activo', 'error');
+        return;
+    }
+    
+    const currentTime = document.getElementById('timerDisplay').textContent;
+    const newTime = prompt(`Editar tiempo manualmente\nFormato: HH:MM:SS\nTiempo actual: ${currentTime}`, currentTime);
+    
+    if (!newTime) return;
+    
+    // Validar formato HH:MM:SS
+    const timeRegex = /^(\d{1,2}):(\d{2}):(\d{2})$/;
+    const match = newTime.match(timeRegex);
+    
+    if (!match) {
+        showNotification('Formato inválido. Use HH:MM:SS', 'error');
+        return;
+    }
+    
+    const hours = parseInt(match[1]);
+    const minutes = parseInt(match[2]);
+    const seconds = parseInt(match[3]);
+    
+    if (minutes >= 60 || seconds >= 60) {
+        showNotification('Minutos y segundos deben ser menores a 60', 'error');
+        return;
+    }
+    
+    // Convertir a segundos totales
+    const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+    
+    try {
+        // Actualizar en el servidor el start_time para reflejar el nuevo tiempo
+        const response = await fetch(`${API_BASE}/timer.php?action=adjust`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                session_id: currentTimerSession.id,
+                elapsed_seconds: totalSeconds
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Actualizar el timerStartTime local para reflejar el nuevo tiempo
+            timerStartTime = Date.now() - (totalSeconds * 1000);
+            showNotification('⏱️ Tiempo actualizado correctamente', 'success');
+        } else {
+            showNotification(data.error || 'Error al actualizar tiempo', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al actualizar tiempo', 'error');
+    }
+}
 
 function startTimerForPhase(phaseId) {
     // Cambiar a tab de timer
