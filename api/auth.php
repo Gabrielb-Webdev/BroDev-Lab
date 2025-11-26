@@ -352,6 +352,53 @@ function verifySession($db) {
         
         if (!$session) {
             // La sesión no existe en BD o expiró
+            // Intentar reconstruir si hay datos válidos en PHP session
+            if ($phpUserId && $phpUserType) {
+                // Verificar que el usuario existe
+                if ($phpUserType === 'admin') {
+                    $stmt = $db->prepare("SELECT id, username, full_name, role FROM admin_users WHERE id = ?");
+                    $stmt->execute([$phpUserId]);
+                    $user = $stmt->fetch();
+                    
+                    if ($user) {
+                        // Usuario válido, recrear sesión en BD
+                        $newSessionToken = bin2hex(random_bytes(32));
+                        $expiresAt = date('Y-m-d H:i:s', time() + 86400); // 24 horas
+                        
+                        $stmt = $db->prepare("
+                            INSERT INTO user_sessions (user_id, user_type, session_token, ip_address, user_agent, expires_at)
+                            VALUES (?, 'admin', ?, ?, ?, ?)
+                        ");
+                        $stmt->execute([
+                            $user['id'],
+                            $newSessionToken,
+                            $_SERVER['REMOTE_ADDR'] ?? null,
+                            $_SERVER['HTTP_USER_AGENT'] ?? null,
+                            $expiresAt
+                        ]);
+                        
+                        // Actualizar sesión PHP
+                        $_SESSION['session_token'] = $newSessionToken;
+                        $_SESSION['user_id'] = $user['id'];
+                        $_SESSION['user_type'] = 'admin';
+                        $_SESSION['username'] = $user['username'];
+                        $_SESSION['full_name'] = $user['full_name'];
+                        $_SESSION['role'] = $user['role'];
+                        $_SESSION['last_activity'] = time();
+                        $_SESSION['authenticated'] = true;
+                        
+                        sendJsonResponse([
+                            'authenticated' => true,
+                            'user_type' => 'admin',
+                            'user_id' => $user['id'],
+                            'debug' => 'session recreated in database'
+                        ]);
+                        return;
+                    }
+                }
+            }
+            
+            // No se pudo recuperar, destruir sesión
             session_unset();
             session_destroy();
             sendJsonResponse([
