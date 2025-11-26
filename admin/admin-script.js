@@ -1146,12 +1146,22 @@ async function checkActiveTimerSession() {
         // SIEMPRE consultar el servidor para obtener el tiempo real actualizado
         const response = await fetch(`${API_BASE}/timer.php?action=active`, {
             credentials: 'include',
-            cache: 'no-cache' // Importante: no usar cache
+            cache: 'no-cache'
         });
         const data = await response.json();
         
         if (data.success && data.data && data.data.elapsed_seconds !== undefined) {
-            currentTimerSession = data.data;
+            // Actualizar la sesión global con TODOS los datos del servidor
+            currentTimerSession = {
+                id: data.data.id,
+                project_id: data.data.project_id,
+                phase_id: data.data.phase_id,
+                project_name: data.data.project_name,
+                phase_name: data.data.phase_name,
+                start_time: data.data.start_time,
+                elapsed_seconds: data.data.elapsed_seconds
+            };
+            
             // El servidor ya calculó el elapsed_seconds real desde start_time
             const elapsed = parseInt(data.data.elapsed_seconds) || 0;
             
@@ -1167,10 +1177,12 @@ async function checkActiveTimerSession() {
             startTimerDisplay(elapsed);
         } else {
             stopTimerDisplay();
+            currentTimerSession = null;
         }
     } catch (error) {
         console.error('Error verificando timer:', error);
         stopTimerDisplay();
+        currentTimerSession = null;
     }
 }
 
@@ -1208,25 +1220,39 @@ function startTimerDisplay(elapsedSeconds = 0) {
         }
     }, 1000);
     
-    // Sincronizar con el servidor cada 10 segundos para corregir cualquier drift
+    // Sincronizar con el servidor cada 15 segundos para corregir cualquier drift
     timerSyncInterval = setInterval(async () => {
-        if (currentTimerSession) {
-            try {
-                const response = await fetch(`${API_BASE}/timer.php?action=active`, {
-                    credentials: 'include',
-                    cache: 'no-cache'
-                });
-                const data = await response.json();
-                if (data.success && data.data && data.data.elapsed_seconds !== undefined) {
-                    // Actualizar el tiempo de inicio basado en el servidor
-                    const serverElapsed = parseInt(data.data.elapsed_seconds) || 0;
+        if (!currentTimerSession || !timerStartTime) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${API_BASE}/timer.php?action=active`, {
+                credentials: 'include',
+                cache: 'no-cache'
+            });
+            const data = await response.json();
+            
+            // Solo sincronizar si hay datos válidos y el timer sigue activo
+            if (data.success && data.data && data.data.id === currentTimerSession.id && data.data.elapsed_seconds !== undefined) {
+                const serverElapsed = parseInt(data.data.elapsed_seconds);
+                const clientElapsed = Math.floor((Date.now() - timerStartTime) / 1000);
+                
+                // Solo ajustar si hay una diferencia mayor a 2 segundos (para evitar ajustes innecesarios)
+                if (Math.abs(serverElapsed - clientElapsed) > 2) {
+                    console.log(`⏱️ Sincronizando timer: ${clientElapsed}s -> ${serverElapsed}s`);
                     timerStartTime = Date.now() - (serverElapsed * 1000);
                 }
-            } catch (error) {
-                console.error('Error sincronizando timer:', error);
+            } else if (!data.data) {
+                // Si el servidor dice que no hay timer activo, detener el timer local
+                console.log('⚠️ Timer detenido en el servidor');
+                stopTimerDisplay();
+                currentTimerSession = null;
             }
+        } catch (error) {
+            console.error('Error sincronizando timer:', error);
         }
-    }, 10000); // Cada 10 segundos
+    }, 15000); // Cada 15 segundos
 }
 
 function stopTimerDisplay() {
