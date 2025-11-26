@@ -1099,6 +1099,46 @@ document.getElementById('phaseForm')?.addEventListener('submit', async (e) => {
     }
 });
 
+async function editPhase(phaseId) {
+    const phase = currentPhases.find(p => p.id === phaseId);
+    if (!phase) return;
+    
+    const newName = prompt('Nombre de la fase:', phase.phase_name);
+    if (!newName) return;
+    
+    const newEstimated = prompt('Horas estimadas:', phase.estimated_hours || 0);
+    if (!newEstimated) return;
+    
+    const newDescription = prompt('Descripción (opcional):', phase.description || '');
+    
+    try {
+        const response = await fetch(`${API_BASE}/phases.php`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                id: phaseId,
+                phase_name: newName,
+                estimated_hours: parseFloat(newEstimated),
+                description: newDescription
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('✅ Fase actualizada', 'success');
+            await loadProjectPhases(currentProjectDetail.id);
+            renderPhasesList();
+        } else {
+            showNotification('Error al actualizar fase', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al actualizar fase', 'error');
+    }
+}
+
 async function deletePhase(phaseId) {
     if (!confirm('¿Estás seguro de eliminar esta fase?')) return;
     

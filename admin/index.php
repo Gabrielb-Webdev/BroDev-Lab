@@ -439,6 +439,6 @@
         </div>
     </div>
 
-    <script src="admin-script.js?v=2.2"></script>
+    <script src="admin-script.js?v=2.3"></script>
 </body>
 </html>
