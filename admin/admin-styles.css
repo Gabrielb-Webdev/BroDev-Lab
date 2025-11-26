@@ -1606,7 +1606,7 @@ select.form-control option:last-child {
     width: 150px;
     font-weight: 600;
     font-size: 0.9rem;
-    color: var(--text-primary);
+    color: #ffffff;
 }
 
 .chart-bar-container {
