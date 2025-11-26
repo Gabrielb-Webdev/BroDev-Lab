@@ -14,27 +14,31 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        // Obtener proyectos o un proyecto específico
         if (isset($_GET['id'])) {
             getProjectById($db, $_GET['id']);
         } elseif (isset($_GET['access_code'])) {
             getProjectByAccessCode($db, $_GET['access_code']);
         } elseif (isset($_GET['client_id'])) {
+            requireAuth();
             getProjectsByClient($db, $_GET['client_id']);
         } else {
+            requireAdmin();
             getAllProjects($db);
         }
         break;
         
     case 'POST':
+        requireAdmin();
         createProject($db);
         break;
         
     case 'PUT':
+        requireAdmin();
         updateProject($db);
         break;
         
     case 'DELETE':
+        requireAdmin();
         deleteProject($db);
         break;
         

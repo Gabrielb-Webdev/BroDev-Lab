@@ -14,24 +14,30 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
+        requireAuth();
+        
         if (isset($_GET['access_code'])) {
             getClientByAccessCode($db, $_GET['access_code']);
         } elseif (isset($_GET['id'])) {
             getClientById($db, $_GET['id']);
         } else {
+            requireAdmin();
             getAllClients($db);
         }
         break;
         
     case 'POST':
+        requireAdmin();
         createClient($db);
         break;
         
     case 'PUT':
+        requireAdmin();
         updateClient($db);
         break;
         
     case 'DELETE':
+        requireAdmin();
         deleteClient($db);
         break;
         

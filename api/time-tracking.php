@@ -9,6 +9,8 @@ require_once '../config/auth-middleware.php';
 
 setCorsHeaders();
 
+requireAuth();
+
 $db = getDBConnection();
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -25,7 +27,8 @@ switch ($method) {
         break;
         
     case 'POST':
-        // Iniciar nueva sesión de tiempo
+        requireAdmin();
+        
         $action = $_GET['action'] ?? 'start';
         if ($action === 'start') {
             startTimeSession($db);

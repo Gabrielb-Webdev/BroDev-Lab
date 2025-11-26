@@ -52,6 +52,13 @@ function requireAdmin() {
         exit;
     }
     
+    // Verificar que el rol sea admin o super_admin
+    if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'super_admin'])) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Acceso denegado. Se requiere rol de administrador.']);
+        exit;
+    }
+    
     return true;
 }
 

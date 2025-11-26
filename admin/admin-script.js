@@ -18,8 +18,16 @@ let clients = [];
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Iniciando aplicación admin...');
     
-    // Cargar panel directamente sin autenticación
-    console.log('✅ Cargando panel...');
+    // Verificar autenticación primero
+    const isAuthenticated = await verifyAuthentication();
+    
+    if (!isAuthenticated) {
+        console.log('⚠️ No autenticado, redirigiendo al login...');
+        window.location.href = './login.php';
+        return;
+    }
+    
+    console.log('✅ Autenticado, cargando panel...');
     
     setupNavigation();
     setupModals();
@@ -32,24 +40,69 @@ document.addEventListener('DOMContentLoaded', async () => {
 // AUTENTICACIÓN
 // ============================================
 async function verifyAuthentication() {
-    // Autenticación deshabilitada - acceso libre
-    return true;
+    try {
+        console.log('🔍 Verificando autenticación...');
+        const response = await fetch(`${API_BASE}/auth.php?action=verify`, {
+            credentials: 'include',
+            cache: 'no-cache'
+        });
+        
+        console.log('📡 Respuesta recibida:', response.status);
+        const data = await response.json();
+        console.log('📋 Datos de autenticación:', JSON.stringify(data, null, 2));
+        
+        if (data.authenticated && data.user_type === 'admin') {
+            console.log('✅ Autenticación exitosa');
+            await loadCurrentUser();
+            return true;
+        }
+        
+        console.log('❌ No autenticado o no es admin. Razón:', data.debug || data.error || 'desconocida');
+        return false;
+    } catch (error) {
+        console.error('❌ Error verificando autenticación:', error);
+        return false;
+    }
 }
 
 async function loadCurrentUser() {
     try {
-        // Mostrar usuario genérico
-        document.getElementById('adminName').textContent = 'Admin';
-        document.querySelector('.admin-avatar').textContent = 'AD';
+        const response = await fetch(`${API_BASE}/auth.php?action=current-user`, {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            const user = data.data;
+            document.getElementById('adminName').textContent = user.full_name || user.username;
+            
+            const initials = user.full_name 
+                ? user.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+                : user.username.substring(0, 2).toUpperCase();
+            document.querySelector('.admin-avatar').textContent = initials;
+        }
     } catch (error) {
         console.error('Error cargando usuario:', error);
     }
 }
 
 async function handleAdminLogout() {
-    // Recargar la página
-    sessionStorage.clear();
-    window.location.reload();
+    try {
+        const response = await fetch(`${API_BASE}/auth.php?action=logout`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            sessionStorage.clear();
+            window.location.href = './login.php';
+        }
+    } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+        window.location.href = './login.php';
+    }
 }
 
 // ============================================
