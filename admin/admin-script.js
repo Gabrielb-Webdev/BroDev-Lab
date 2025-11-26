@@ -639,30 +639,30 @@ function stopTimer() {
 // DASHBOARD
 // ============================================
 function updateDashboard() {
-    // Estadísticas con animación
+    // Estadísticas
     const activeProjects = projects.filter(p => p.status === 'in_progress').length;
     const activeProjectsEl = document.getElementById('activeProjects');
     if (activeProjectsEl) {
-        activeProjectsEl.textContent = `${activeProjects}+`;
+        activeProjectsEl.textContent = activeProjects;
     }
     
     const totalClientsEl = document.getElementById('totalClients');
     if (totalClientsEl) {
-        totalClientsEl.textContent = `${clients.length}+`;
+        totalClientsEl.textContent = clients.length;
     }
     
     // Calcular horas del mes
     const totalHours = projects.reduce((sum, p) => sum + (p.total_time_seconds || 0), 0) / 3600;
     const monthlyHoursEl = document.getElementById('monthlyHours');
     if (monthlyHoursEl) {
-        monthlyHoursEl.textContent = `${totalHours.toFixed(1)}h+`;
+        monthlyHoursEl.textContent = `${totalHours.toFixed(1)}h`;
     }
     
     // Calcular ingresos estimados
     const revenue = projects.reduce((sum, p) => sum + ((p.total_time_seconds || 0) / 3600 * (p.hourly_rate || 0)), 0);
     const estimatedRevenueEl = document.getElementById('estimatedRevenue');
     if (estimatedRevenueEl) {
-        estimatedRevenueEl.textContent = `$${revenue.toFixed(2)}+`;
+        estimatedRevenueEl.textContent = `$${revenue.toFixed(2)}`;
     }
     
     // Proyectos recientes
@@ -879,14 +879,10 @@ async function viewProjectDetail(projectId) {
         currentProjectDetail = projects.find(p => p.id === projectId);
         if (!currentProjectDetail) return;
         
-        // Cargar datos del proyecto
-        await loadProjectPhases(projectId);
-        await loadProjectStats(projectId);
-        
-        // Abrir modal
+        // Abrir modal inmediatamente
         openModal('projectDetailModal');
         
-        // Llenar información general
+        // Llenar información general de inmediato
         document.getElementById('projectDetailTitle').textContent = currentProjectDetail.project_name;
         document.getElementById('detail-client').textContent = currentProjectDetail.client_name || 'N/A';
         document.getElementById('detail-status').value = currentProjectDetail.status;
@@ -900,19 +896,23 @@ async function viewProjectDetail(projectId) {
         document.getElementById('detail-progress-text').textContent = `${progress.toFixed(1)}%`;
         document.getElementById('detail-progress-bar').style.width = `${progress}%`;
         
-        // Evento para cambio de estado
+        // Configurar tabs
+        setupTabs();
+        
+        // Evento para cambio de estado (solo una vez)
+        const statusSelect = document.getElementById('detail-status');
+        statusSelect.replaceWith(statusSelect.cloneNode(true));
         document.getElementById('detail-status').addEventListener('change', async (e) => {
             await updateProjectStatus(projectId, e.target.value);
         });
         
-        // Configurar tabs
-        setupTabs();
-        
-        // Renderizar fases
-        renderPhasesList();
-        
-        // Verificar sesión activa
-        await checkActiveTimerSession();
+        // Cargar datos en paralelo (no bloquea la UI)
+        Promise.all([
+            loadProjectPhases(projectId),
+            checkActiveTimerSession()
+        ]).then(() => {
+            renderPhasesList();
+        });
         
     } catch (error) {
         console.error('Error al cargar detalles del proyecto:', error);
@@ -1028,16 +1028,16 @@ function renderPhasesList() {
             <div class="phase-details">
                 <div class="phase-detail-item">
                     <span class="phase-detail-label">Estimado</span>
-                    <span class="phase-detail-value">${phase.estimated_hours || 0}h</span>
+                    <span class="phase-detail-value">${parseFloat(phase.estimated_hours || 0).toFixed(1)}h</span>
                 </div>
                 <div class="phase-detail-item">
                     <span class="phase-detail-label">Tiempo Real</span>
-                    <span class="phase-detail-value">${(phase.total_hours || 0).toFixed(2)}h</span>
+                    <span class="phase-detail-value">${parseFloat(phase.total_hours || 0).toFixed(2)}h</span>
                 </div>
                 <div class="phase-detail-item">
                     <span class="phase-detail-label">Diferencia</span>
-                    <span class="phase-detail-value" style="color: ${(phase.total_hours || 0) > (phase.estimated_hours || 0) ? '#ef4444' : '#22c55e'}">
-                        ${((phase.total_hours || 0) - (phase.estimated_hours || 0)).toFixed(2)}h
+                    <span class="phase-detail-value" style="color: ${parseFloat(phase.total_hours || 0) > parseFloat(phase.estimated_hours || 0) ? '#ef4444' : '#22c55e'}">
+                        ${(parseFloat(phase.total_hours || 0) - parseFloat(phase.estimated_hours || 0)).toFixed(2)}h
                     </span>
                 </div>
             </div>

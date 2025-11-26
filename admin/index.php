@@ -443,6 +443,6 @@
         </div>
     </div>
 
-    <script src="admin-script.js?v=1.0"></script>
+    <script src="admin-script.js?v=1.1"></script>
 </body>
 </html>
