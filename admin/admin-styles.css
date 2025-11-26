@@ -1362,10 +1362,40 @@
     color: var(--text-secondary);
 }
 
+.session-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .session-duration {
     font-size: 1.3rem;
     font-weight: 700;
     color: var(--accent-primary);
+}
+
+.btn-icon-small {
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+
+.btn-icon-small:hover {
+    background: rgba(124, 58, 237, 0.2);
+    transform: translateY(-2px);
+}
+
+.btn-danger-small {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.btn-danger-small:hover {
+    background: rgba(239, 68, 68, 0.2);
 }
 
 /* Stats Grid Detail */

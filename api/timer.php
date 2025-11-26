@@ -33,6 +33,10 @@ switch ($method) {
             pauseTimer($db);
         } elseif ($action === 'adjust') {
             adjustTimer($db);
+        } elseif ($action === 'update') {
+            updateTimerSession($db);
+        } elseif ($action === 'delete') {
+            deleteTimerSession($db);
         }
         break;
         
@@ -288,6 +292,127 @@ function adjustTimer($db) {
             'success' => true,
             'message' => 'Tiempo ajustado correctamente',
             'elapsed_seconds' => $elapsedSeconds
+        ]);
+        
+    } catch (PDOException $e) {
+        sendJsonResponse(['error' => $e->getMessage()], 500);
+    }
+}
+
+function updateTimerSession($db) {
+    try {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($data['session_id']) || !isset($data['duration_seconds'])) {
+            sendJsonResponse(['error' => 'session_id y duration_seconds son requeridos'], 400);
+            return;
+        }
+        
+        $sessionId = $data['session_id'];
+        $newDuration = intval($data['duration_seconds']);
+        
+        if ($newDuration <= 0) {
+            sendJsonResponse(['error' => 'La duración debe ser mayor a 0'], 400);
+            return;
+        }
+        
+        // Obtener la sesión actual
+        $stmt = $db->prepare("SELECT * FROM time_sessions WHERE id = ? AND is_active = 0");
+        $stmt->execute([$sessionId]);
+        $session = $stmt->fetch();
+        
+        if (!$session) {
+            sendJsonResponse(['error' => 'Sesión no encontrada o aún está activa'], 404);
+            return;
+        }
+        
+        $oldDuration = $session['duration_seconds'];
+        $difference = $newDuration - $oldDuration;
+        
+        // Actualizar la duración de la sesión
+        $stmt = $db->prepare("
+            UPDATE time_sessions 
+            SET duration_seconds = ?
+            WHERE id = ?
+        ");
+        $stmt->execute([$newDuration, $sessionId]);
+        
+        // Actualizar el tiempo total del proyecto
+        $stmt = $db->prepare("
+            UPDATE projects 
+            SET total_time_seconds = total_time_seconds + ?
+            WHERE id = ?
+        ");
+        $stmt->execute([$difference, $session['project_id']]);
+        
+        // Actualizar el tiempo total de la fase si existe
+        if ($session['phase_id']) {
+            $stmt = $db->prepare("
+                UPDATE project_phases 
+                SET actual_time_seconds = actual_time_seconds + ?
+                WHERE id = ?
+            ");
+            $stmt->execute([$difference, $session['phase_id']]);
+        }
+        
+        sendJsonResponse([
+            'success' => true,
+            'message' => 'Sesión actualizada correctamente',
+            'old_duration' => $oldDuration,
+            'new_duration' => $newDuration
+        ]);
+        
+    } catch (PDOException $e) {
+        sendJsonResponse(['error' => $e->getMessage()], 500);
+    }
+}
+
+function deleteTimerSession($db) {
+    try {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($data['session_id'])) {
+            sendJsonResponse(['error' => 'session_id es requerido'], 400);
+            return;
+        }
+        
+        $sessionId = $data['session_id'];
+        
+        // Obtener la sesión
+        $stmt = $db->prepare("SELECT * FROM time_sessions WHERE id = ? AND is_active = 0");
+        $stmt->execute([$sessionId]);
+        $session = $stmt->fetch();
+        
+        if (!$session) {
+            sendJsonResponse(['error' => 'Sesión no encontrada o aún está activa'], 404);
+            return;
+        }
+        
+        // Restar el tiempo del proyecto
+        $stmt = $db->prepare("
+            UPDATE projects 
+            SET total_time_seconds = GREATEST(0, total_time_seconds - ?)
+            WHERE id = ?
+        ");
+        $stmt->execute([$session['duration_seconds'], $session['project_id']]);
+        
+        // Restar el tiempo de la fase si existe
+        if ($session['phase_id']) {
+            $stmt = $db->prepare("
+                UPDATE project_phases 
+                SET actual_time_seconds = GREATEST(0, actual_time_seconds - ?)
+                WHERE id = ?
+            ");
+            $stmt->execute([$session['duration_seconds'], $session['phase_id']]);
+        }
+        
+        // Eliminar la sesión
+        $stmt = $db->prepare("DELETE FROM time_sessions WHERE id = ?");
+        $stmt->execute([$sessionId]);
+        
+        sendJsonResponse([
+            'success' => true,
+            'message' => 'Sesión eliminada correctamente'
         ]);
         
     } catch (PDOException $e) {

@@ -1455,9 +1455,114 @@ function renderTimerHistory(sessions) {
                 <p>${new Date(session.start_time).toLocaleDateString()} - ${session.session_description || 'Sin descripción'}</p>
                 ${session.notes ? `<p style="font-style: italic;">${session.notes}</p>` : ''}
             </div>
-            <div class="session-duration">${formatSeconds(session.duration_seconds)}</div>
+            <div class="session-actions">
+                <span class="session-duration">${formatSeconds(session.duration_seconds)}</span>
+                <button class="btn-icon-small" onclick="editTimerSession(${session.id}, ${session.duration_seconds})" title="Editar tiempo">
+                    ✏️
+                </button>
+                <button class="btn-icon-small btn-danger-small" onclick="deleteTimerSession(${session.id})" title="Eliminar sesión">
+                    🗑️
+                </button>
+            </div>
         </div>
     `).join('');
+}
+
+async function editTimerSession(sessionId, currentDuration) {
+    const currentTime = formatSeconds(currentDuration);
+    const newTime = prompt(`Editar tiempo de la sesión\nFormato: HH:MM:SS\nTiempo actual: ${currentTime}`, currentTime);
+    
+    if (!newTime) return;
+    
+    // Validar formato HH:MM:SS
+    const timeRegex = /^(\d{1,2}):(\d{2}):(\d{2})$/;
+    const match = newTime.match(timeRegex);
+    
+    if (!match) {
+        showNotification('Formato inválido. Use HH:MM:SS', 'error');
+        return;
+    }
+    
+    const hours = parseInt(match[1]);
+    const minutes = parseInt(match[2]);
+    const seconds = parseInt(match[3]);
+    
+    if (minutes >= 60 || seconds >= 60) {
+        showNotification('Minutos y segundos deben ser menores a 60', 'error');
+        return;
+    }
+    
+    const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+    
+    if (totalSeconds <= 0) {
+        showNotification('El tiempo debe ser mayor a 0', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/timer.php?action=update`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                session_id: sessionId,
+                duration_seconds: totalSeconds
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('⏱️ Tiempo actualizado correctamente', 'success');
+            await loadTimerHistory();
+            await loadProjects();
+            if (currentProjectDetail) {
+                await loadProjectPhases(currentProjectDetail.id);
+                renderPhasesList();
+            }
+            updateDashboard();
+        } else {
+            showNotification(data.error || 'Error al actualizar tiempo', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al actualizar tiempo', 'error');
+    }
+}
+
+async function deleteTimerSession(sessionId) {
+    if (!confirm('¿Estás seguro de eliminar esta sesión? Esta acción no se puede deshacer.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/timer.php?action=delete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                session_id: sessionId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('🗑️ Sesión eliminada correctamente', 'success');
+            await loadTimerHistory();
+            await loadProjects();
+            if (currentProjectDetail) {
+                await loadProjectPhases(currentProjectDetail.id);
+                renderPhasesList();
+            }
+            updateDashboard();
+        } else {
+            showNotification(data.error || 'Error al eliminar sesión', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al eliminar sesión', 'error');
+    }
 }
 
 // ============================================
