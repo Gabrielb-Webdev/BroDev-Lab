@@ -635,37 +635,56 @@ function stopTimer() {
 // DASHBOARD
 // ============================================
 function updateDashboard() {
-    // Estadísticas
+    // Estadísticas con animación
     const activeProjects = projects.filter(p => p.status === 'in_progress').length;
-    document.getElementById('activeProjects').textContent = activeProjects;
-    document.getElementById('totalClients').textContent = clients.length;
+    const activeProjectsEl = document.getElementById('activeProjects');
+    if (activeProjectsEl) {
+        activeProjectsEl.textContent = `${activeProjects}+`;
+    }
+    
+    const totalClientsEl = document.getElementById('totalClients');
+    if (totalClientsEl) {
+        totalClientsEl.textContent = `${clients.length}+`;
+    }
     
     // Calcular horas del mes
     const totalHours = projects.reduce((sum, p) => sum + (p.total_time_seconds || 0), 0) / 3600;
-    document.getElementById('monthlyHours').textContent = `${totalHours.toFixed(1)}h`;
+    const monthlyHoursEl = document.getElementById('monthlyHours');
+    if (monthlyHoursEl) {
+        monthlyHoursEl.textContent = `${totalHours.toFixed(1)}h+`;
+    }
     
     // Calcular ingresos estimados
     const revenue = projects.reduce((sum, p) => sum + ((p.total_time_seconds || 0) / 3600 * (p.hourly_rate || 0)), 0);
-    document.getElementById('estimatedRevenue').textContent = `$${revenue.toFixed(2)}`;
+    const estimatedRevenueEl = document.getElementById('estimatedRevenue');
+    if (estimatedRevenueEl) {
+        estimatedRevenueEl.textContent = `$${revenue.toFixed(2)}+`;
+    }
     
     // Proyectos recientes
     const recentProjects = projects.slice(0, 5);
-    document.getElementById('recentProjects').innerHTML = recentProjects.length > 0 
-        ? recentProjects.map(p => `
-            <div class="dashboard-item">
-                <strong>${p.project_name}</strong>
-                <span class="badge ${p.status}">${formatStatus(p.status)}</span>
-            </div>
-        `).join('')
-        : '<p class="empty-text">No hay proyectos recientes</p>';
+    const recentProjectsEl = document.getElementById('recentProjects');
+    if (recentProjectsEl) {
+        recentProjectsEl.innerHTML = recentProjects.length > 0 
+            ? recentProjects.map(p => `
+                <div class="dashboard-item">
+                    <strong>${p.project_name}</strong>
+                    <span class="badge ${p.status}">${formatStatus(p.status)}</span>
+                </div>
+            `).join('')
+            : '<p class="empty-text">No hay proyectos recientes</p>';
+    }
     
     // Sesiones activas
-    document.getElementById('activeSessions').innerHTML = activeSession
-        ? `<div class="dashboard-item">
-            <strong>${projects.find(p => p.id == activeSession.project_id)?.project_name}</strong>
-            <span id="dashboardTimer">00:00:00</span>
-        </div>`
-        : '<p class="empty-text">No hay sesiones activas</p>';
+    const activeSessionsEl = document.getElementById('activeSessions');
+    if (activeSessionsEl) {
+        activeSessionsEl.innerHTML = activeSession
+            ? `<div class="dashboard-item">
+                <strong>${projects.find(p => p.id == activeSession.project_id)?.project_name}</strong>
+                <span id="dashboardTimer">00:00:00</span>
+            </div>`
+            : '<p class="empty-text">No hay sesiones activas</p>';
+    }
 }
 
 // ============================================

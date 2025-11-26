@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - BroDev Lab</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-    <link rel="stylesheet" href="../styles.css?v=0.6">
-    <link rel="stylesheet" href="admin-styles.css?v=0.6">
+    <link rel="stylesheet" href="../styles.css?v=0.7">
+    <link rel="stylesheet" href="admin-styles.css?v=0.7">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
@@ -17,8 +17,20 @@
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-                    <rect x="10" y="20" width="30" height="30" rx="4" fill="#7C3AED"/>
-                    <rect x="60" y="20" width="30" height="30" rx="4" fill="#EC4899"/>
+                    <!-- Bro 1 - Purple (left) -->
+                    <g id="bro1">
+                        <rect x="8" y="25" width="35" height="35" rx="4" fill="#7C3AED" stroke="#8B5CF6" stroke-width="2"/>
+                        <rect x="15" y="35" width="7" height="7" fill="#0A0118"/>
+                        <rect x="29" y="35" width="7" height="7" fill="#0A0118"/>
+                        <rect x="19" y="50" width="13" height="3" rx="1.5" fill="#0A0118"/>
+                    </g>
+                    <!-- Bro 2 - Pink (right) -->
+                    <g id="bro2">
+                        <rect x="57" y="25" width="35" height="35" rx="4" fill="#EC4899" stroke="#F472B6" stroke-width="2"/>
+                        <rect x="62" y="33" width="25" height="9" rx="2" fill="#0A0118" opacity="0.9"/>
+                        <line x1="74.5" y1="33" x2="74.5" y2="42" stroke="#EC4899" stroke-width="1.5"/>
+                        <path d="M 66 50 Q 74.5 54 83 50" stroke="#0A0118" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    </g>
                 </svg>
                 <span>BroDev Lab</span>
             </div>
@@ -252,6 +264,6 @@
         </div>
     </div>
 
-    <script src="admin-script.js?v=0.2"></script>
+    <script src="admin-script.js?v=0.7"></script>
 </body>
 </html>
