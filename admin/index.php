@@ -6,7 +6,7 @@
     <title>Admin Panel - BroDev Lab</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <link rel="stylesheet" href="../styles.css?v=1.0">
-    <link rel="stylesheet" href="admin-styles.css?v=1.9">
+    <link rel="stylesheet" href="admin-styles.css?v=2.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
@@ -286,18 +286,23 @@
                         </div>
                         <div class="info-item">
                             <label>Estado:</label>
-                            <select id="detail-status" class="status-dropdown">
-                                <option value="quote">💭 Cotización</option>
-                                <option value="pending_approval">⏳ Pendiente Aprobación</option>
-                                <option value="approved">✅ Aprobado</option>
-                                <option value="in_progress">🚀 En Progreso</option>
-                                <option value="review">👀 En Revisión</option>
-                                <option value="testing">🧪 Testing</option>
-                                <option value="client_review">📋 Revisión Cliente</option>
-                                <option value="completed">✔️ Completado</option>
-                                <option value="on_hold">⏸️ En Espera</option>
-                                <option value="cancelled">❌ Cancelado</option>
-                            </select>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <select id="detail-status" class="status-dropdown">
+                                    <option value="quote">💭 Cotización</option>
+                                    <option value="pending_approval">⏳ Pendiente Aprobación</option>
+                                    <option value="approved">✅ Aprobado</option>
+                                    <option value="in_progress">🚀 En Progreso</option>
+                                    <option value="review">👀 En Revisión</option>
+                                    <option value="testing">🧪 Testing</option>
+                                    <option value="client_review">📋 Revisión Cliente</option>
+                                    <option value="completed">✔️ Completado</option>
+                                    <option value="on_hold">⏸️ En Espera</option>
+                                    <option value="cancelled">❌ Cancelado</option>
+                                </select>
+                                <button id="saveStatusBtn" class="btn-icon-small" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: all 0.3s ease;" title="Guardar estado">
+                                    💾 Guardar
+                                </button>
+                            </div>
                         </div>
                         <div class="info-item">
                             <label>Tipo:</label>
@@ -352,9 +357,6 @@
                         <div class="timer-status" id="timerStatus">Detenido</div>
                     </div>
                     <div class="timer-controls">
-                        <label for="timerPhaseSelect" style="font-weight: 600; color: var(--text-primary); margin-bottom: 8px; display: block;">
-                            Fase <span style="color: #ef4444;">*</span>
-                        </label>
                         <select id="timerPhaseSelect" class="form-control" required>
                             <option value="" disabled selected>Seleccionar fase...</option>
                         </select>
@@ -442,6 +444,6 @@
         </div>
     </div>
 
-    <script src="admin-script.js?v=2.5"></script>
+    <script src="admin-script.js?v=2.7"></script>
 </body>
 </html>

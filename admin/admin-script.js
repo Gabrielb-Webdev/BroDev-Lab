@@ -909,11 +909,17 @@ async function viewProjectDetail(projectId) {
         // Configurar tabs
         setupTabs();
         
-        // Evento para cambio de estado (solo una vez)
+        // Configurar botón de guardar estado
+        const saveStatusBtn = document.getElementById('saveStatusBtn');
         const statusSelect = document.getElementById('detail-status');
-        statusSelect.replaceWith(statusSelect.cloneNode(true));
-        document.getElementById('detail-status').addEventListener('change', async (e) => {
-            await updateProjectStatus(projectId, e.target.value);
+        
+        // Limpiar eventos previos
+        saveStatusBtn.replaceWith(saveStatusBtn.cloneNode(true));
+        const newSaveBtn = document.getElementById('saveStatusBtn');
+        
+        newSaveBtn.addEventListener('click', async () => {
+            const newStatus = statusSelect.value;
+            await updateProjectStatus(projectId, newStatus);
         });
         
         // Cargar datos en paralelo (no bloquea la UI)
@@ -973,15 +979,29 @@ async function updateProjectStatus(projectId, newStatus) {
         const data = await response.json();
         
         if (data.success) {
-            showNotification('✅ Estado actualizado', 'success');
+            showNotification('✅ Estado actualizado correctamente', 'success');
+            
+            // Actualizar el estado en currentProjectDetail
+            if (currentProjectDetail && currentProjectDetail.id === projectId) {
+                currentProjectDetail.status = newStatus;
+            }
+            
+            // Recargar lista de proyectos
             await loadProjects();
+            
+            // Actualizar el dropdown para reflejar el estado guardado
+            const statusSelect = document.getElementById('detail-status');
+            if (statusSelect) {
+                statusSelect.value = newStatus;
+            }
+            
             updateDashboard();
         } else {
-            showNotification('Error al actualizar estado', 'error');
+            showNotification('❌ Error al actualizar estado', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        showNotification('Error al actualizar estado', 'error');
+        showNotification('❌ Error al actualizar estado', 'error');
     }
 }
 
