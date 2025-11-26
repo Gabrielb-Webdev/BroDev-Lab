@@ -23,6 +23,9 @@ switch ($method) {
             getPhaseTimeSessions($db, $_GET['phase_id']);
         } elseif (isset($_GET['active'])) {
             getActiveSessions($db);
+        } else {
+            // Listar todas las sesiones
+            getAllTimeSessions($db);
         }
         break;
         
@@ -330,6 +333,29 @@ function getActiveSessions($db) {
             $session['elapsed_seconds'] = $now->getTimestamp() - $startTime->getTimestamp();
             $session['elapsed_formatted'] = formatTime($session['elapsed_seconds']);
         }
+        
+        sendJsonResponse(['success' => true, 'data' => $sessions]);
+    } catch (PDOException $e) {
+        sendJsonResponse(['error' => $e->getMessage()], 500);
+    }
+}
+
+function getAllTimeSessions($db) {
+    try {
+        $stmt = $db->query("
+            SELECT 
+                ts.*,
+                pp.phase_name,
+                p.project_name,
+                c.company_name as client_name
+            FROM time_sessions ts
+            LEFT JOIN project_phases pp ON ts.phase_id = pp.id
+            LEFT JOIN projects p ON ts.project_id = p.id
+            LEFT JOIN clients c ON p.client_id = c.id
+            ORDER BY ts.start_time DESC
+            LIMIT 100
+        ");
+        $sessions = $stmt->fetchAll();
         
         sendJsonResponse(['success' => true, 'data' => $sessions]);
     } catch (PDOException $e) {

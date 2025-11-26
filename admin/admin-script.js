@@ -16,18 +16,13 @@ let clients = [];
 // INICIALIZACIÓN
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Iniciando aplicación admin...');
-    
     // Verificar autenticación primero
     const isAuthenticated = await verifyAuthentication();
     
     if (!isAuthenticated) {
-        console.log('⚠️ No autenticado, redirigiendo al login...');
         window.location.href = './login.php';
         return;
     }
-    
-    console.log('✅ Autenticado, cargando panel...');
     
     setupNavigation();
     setupModals();
@@ -41,26 +36,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============================================
 async function verifyAuthentication() {
     try {
-        console.log('🔍 Verificando autenticación...');
         const response = await fetch(`${API_BASE}/auth.php?action=verify`, {
             credentials: 'include',
             cache: 'no-cache'
         });
         
-        console.log('📡 Respuesta recibida:', response.status);
         const data = await response.json();
-        console.log('📋 Datos de autenticación:', JSON.stringify(data, null, 2));
         
         if (data.authenticated && data.user_type === 'admin') {
-            console.log('✅ Autenticación exitosa');
             await loadCurrentUser();
             return true;
         }
         
-        console.log('❌ No autenticado o no es admin. Razón:', data.debug || data.error || 'desconocida');
         return false;
     } catch (error) {
-        console.error('❌ Error verificando autenticación:', error);
+        console.error('Error verificando autenticación:', error);
         return false;
     }
 }
@@ -147,8 +137,7 @@ function switchView(viewName) {
     const titles = {
         dashboard: 'Dashboard',
         projects: 'Proyectos',
-        clients: 'Clientes',
-        time: 'Time Tracking'
+        clients: 'Clientes'
     };
     document.getElementById('pageTitle').textContent = titles[viewName] || viewName;
     
@@ -161,12 +150,13 @@ function switchView(viewName) {
 // ============================================
 async function loadInitialData() {
     try {
-        await Promise.all([
+        // Cargar solo proyectos y clientes básicos al inicio (lazy loading)
+        const [projectsData, clientsData] = await Promise.all([
             loadProjects(),
-            loadClients(),
-            checkActiveSession()
+            loadClients()
         ]);
         
+        // Actualizar dashboard con los datos ya cargados
         updateDashboard();
     } catch (error) {
         console.error('Error cargando datos:', error);
@@ -180,15 +170,18 @@ async function loadViewData(viewName) {
             updateDashboard();
             break;
         case 'projects':
-            await loadProjects();
+            // Solo recargar si no hay datos en cache
+            if (projects.length === 0) {
+                await loadProjects();
+            }
             renderProjectsList();
             break;
         case 'clients':
-            await loadClients();
+            // Solo recargar si no hay datos en cache
+            if (clients.length === 0) {
+                await loadClients();
+            }
             renderClientsList();
-            break;
-        case 'time':
-            await loadTimeSessions();
             break;
     }
 }
@@ -793,7 +786,7 @@ function startAutoRefresh() {
             await loadProjects();
             updateDashboard();
         }
-    }, 30000); // Cada 30 segundos
+    }, 60000); // Cada 60 segundos
 }
 
 // ============================================
