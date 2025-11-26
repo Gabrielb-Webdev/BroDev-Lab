@@ -352,10 +352,13 @@
                         <div class="timer-status" id="timerStatus">Detenido</div>
                     </div>
                     <div class="timer-controls">
-                        <select id="timerPhaseSelect" class="form-control">
+                        <label for="timerPhaseSelect" style="font-weight: 600; color: var(--text-primary); margin-bottom: 8px; display: block;">
+                            Fase <span style="color: #ef4444;">*</span>
+                        </label>
+                        <select id="timerPhaseSelect" class="form-control" required>
                             <option value="">Seleccionar fase...</option>
                         </select>
-                        <input type="text" id="timerDescription" class="form-control" placeholder="Descripción de la sesión...">
+                        <input type="text" id="timerDescription" class="form-control" placeholder="Descripción de la sesión (opcional)..." style="margin-top: 12px;">
                         <div class="timer-buttons">
                             <button id="startTimerBtn" class="btn-timer btn-timer-start">▶️ Iniciar</button>
                             <button id="stopTimerBtn" class="btn-timer btn-timer-stop" style="display:none;">⏹️ Detener</button>

@@ -1375,6 +1375,12 @@ document.getElementById('startTimerBtn')?.addEventListener('click', async () => 
     const phaseId = document.getElementById('timerPhaseSelect').value;
     const description = document.getElementById('timerDescription').value;
     
+    // Validar que se haya seleccionado una fase
+    if (!phaseId) {
+        showNotification('⚠️ Debes seleccionar una fase para iniciar el timer', 'error');
+        return;
+    }
+    
     try {
         const response = await fetch(`${API_BASE}/timer.php?action=start`, {
             method: 'POST',
@@ -1561,12 +1567,26 @@ function renderTimerHistory(sessions) {
         // Asegurar que duration_seconds sea un número válido
         const duration = parseInt(session.duration_seconds) || 0;
         
+        // Formatear horas de inicio y fin
+        const startTime = new Date(session.start_time);
+        const startTimeStr = startTime.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+        
+        let endTimeStr = '';
+        if (session.end_time) {
+            const endTime = new Date(session.end_time);
+            endTimeStr = endTime.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        const dateStr = startTime.toLocaleDateString('es-AR');
+        const timeRange = endTimeStr ? `${startTimeStr} - ${endTimeStr}` : `Desde ${startTimeStr}`;
+        
         return `
             <div class="timer-session-item">
                 <div class="session-info">
                     <h4>${session.phase_name || 'Sin fase'}</h4>
-                    <p>${new Date(session.start_time).toLocaleDateString()} - ${session.session_description || 'Sin descripción'}</p>
-                    ${session.notes ? `<p style="font-style: italic;">${session.notes}</p>` : ''}
+                    <p><strong>${dateStr}</strong> | ${timeRange}</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">${session.session_description || 'Sin descripción'}</p>
+                    ${session.notes ? `<p style="font-style: italic; color: var(--text-secondary); font-size: 0.85rem;">📝 ${session.notes}</p>` : ''}
                 </div>
                 <div class="session-actions">
                     <span class="session-duration">${formatSeconds(duration)}</span>
