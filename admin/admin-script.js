@@ -822,11 +822,18 @@ function formatDateTime(dateString) {
 
 function formatStatus(status) {
     const statuses = {
-        pending: 'Pendiente',
-        in_progress: 'En Progreso',
-        completed: 'Completado',
-        on_hold: 'En Pausa',
-        cancelled: 'Cancelado'
+        quote: '💭 Cotización',
+        pending_approval: '⏳ Pendiente Aprobación',
+        approved: '✅ Aprobado',
+        in_progress: '🚀 En Progreso',
+        review: '👀 En Revisión',
+        testing: '🧪 Testing',
+        client_review: '📋 Revisión Cliente',
+        completed: '✔️ Completado',
+        on_hold: '⏸️ En Espera',
+        cancelled: '❌ Cancelado',
+        // Mantener compatibilidad con estados antiguos
+        pending: '💭 Cotización'
     };
     return statuses[status] || status;
 }

@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS projects (
     description TEXT,
     budget DECIMAL(10, 2),
     hourly_rate DECIMAL(10, 2) DEFAULT 50.00,
-    status ENUM('pending', 'in_progress', 'completed', 'on_hold', 'cancelled') DEFAULT 'pending',
+    status ENUM('quote', 'pending_approval', 'approved', 'in_progress', 'review', 'testing', 'client_review', 'completed', 'on_hold', 'cancelled') DEFAULT 'quote',
     start_date DATE,
     estimated_end_date DATE,
     actual_end_date DATE NULL,
