@@ -56,12 +56,6 @@ if (PHP_VERSION_ID >= 70300) {
 // Iniciar sesión PHP
 session_start();
 
-// Regenerar ID de sesión si es una nueva sesión para evitar session fixation
-if (!isset($_SESSION['initialized'])) {
-    session_regenerate_id(true);
-    $_SESSION['initialized'] = true;
-}
-
 setCorsHeaders();
 
 try {
@@ -178,7 +172,10 @@ function loginAdmin($db, $username, $password) {
         $stmt = $db->prepare("UPDATE admin_users SET last_login = NOW() WHERE id = ?");
         $stmt->execute([$user['id']]);
         
-        // Guardar en sesión PHP
+        // Regenerar ID de sesión por seguridad ANTES de establecer las variables
+        session_regenerate_id(true);
+        
+        // Guardar en sesión PHP (después de regenerar)
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_type'] = 'admin';
         $_SESSION['username'] = $user['username'];
@@ -186,9 +183,11 @@ function loginAdmin($db, $username, $password) {
         $_SESSION['role'] = $user['role'];
         $_SESSION['session_token'] = $sessionToken;
         $_SESSION['last_activity'] = time();
+        $_SESSION['authenticated'] = true;
         
-        // Regenerar ID de sesión por seguridad después del login
-        session_regenerate_id(true);
+        // Forzar escritura de la sesión
+        session_write_close();
+        session_start();
         
         sendJsonResponse([
             'success' => true,
@@ -319,25 +318,30 @@ function verifySession($db) {
             return;
         }
         
-        // Debug: Ver qué hay en la sesión
+        // Debug: Ver qué hay en la sesión PHP
         $sessionData = [
             'session_id' => session_id(),
             'has_token' => isset($_SESSION['session_token']),
+            'has_user_id' => isset($_SESSION['user_id']),
+            'has_user_type' => isset($_SESSION['user_type']),
+            'user_type_value' => $_SESSION['user_type'] ?? null,
             'session_keys' => array_keys($_SESSION)
         ];
         
         $sessionToken = $_SESSION['session_token'] ?? null;
+        $phpUserId = $_SESSION['user_id'] ?? null;
+        $phpUserType = $_SESSION['user_type'] ?? null;
         
         if (!$sessionToken) {
             sendJsonResponse([
                 'authenticated' => false, 
-                'debug' => 'no session token',
+                'debug' => 'no session token in PHP session',
                 'session_info' => $sessionData
             ], 200);
             return;
         }
         
-        // Verificar que la sesión existe y no ha expirado
+        // Verificar que la sesión existe en la base de datos y no ha expirado
         $stmt = $db->prepare("
             SELECT user_id, user_type, expires_at 
             FROM user_sessions 
@@ -347,20 +351,52 @@ function verifySession($db) {
         $session = $stmt->fetch();
         
         if (!$session) {
+            // La sesión no existe en BD o expiró
             session_unset();
             session_destroy();
-            sendJsonResponse(['authenticated' => false], 200);
+            sendJsonResponse([
+                'authenticated' => false, 
+                'debug' => 'session not found in database or expired',
+                'session_info' => $sessionData
+            ], 200);
             return;
         }
         
-        // Actualizar última actividad
-        $_SESSION['last_activity'] = time();
-        
-        sendJsonResponse([
-            'authenticated' => true,
-            'user_type' => $session['user_type'],
-            'user_id' => $session['user_id']
-        ]);
+        // Verificar que los datos de la sesión PHP coincidan con la BD
+        if ($phpUserId && $phpUserType && $phpUserId == $session['user_id'] && $phpUserType == $session['user_type']) {
+            // Todo está bien, actualizar última actividad
+            $_SESSION['last_activity'] = time();
+            
+            sendJsonResponse([
+                'authenticated' => true,
+                'user_type' => $session['user_type'],
+                'user_id' => $session['user_id']
+            ]);
+        } else {
+            // Inconsistencia entre sesión PHP y BD, reconstruir sesión
+            $_SESSION['user_id'] = $session['user_id'];
+            $_SESSION['user_type'] = $session['user_type'];
+            $_SESSION['last_activity'] = time();
+            
+            // Obtener más información del usuario
+            if ($session['user_type'] === 'admin') {
+                $stmt = $db->prepare("SELECT username, full_name, role FROM admin_users WHERE id = ?");
+                $stmt->execute([$session['user_id']]);
+                $user = $stmt->fetch();
+                if ($user) {
+                    $_SESSION['username'] = $user['username'];
+                    $_SESSION['full_name'] = $user['full_name'];
+                    $_SESSION['role'] = $user['role'];
+                }
+            }
+            
+            sendJsonResponse([
+                'authenticated' => true,
+                'user_type' => $session['user_type'],
+                'user_id' => $session['user_id'],
+                'debug' => 'session reconstructed from database'
+            ]);
+        }
         
     } catch (PDOException $e) {
         sendJsonResponse(['authenticated' => false, 'error' => $e->getMessage()], 200);
