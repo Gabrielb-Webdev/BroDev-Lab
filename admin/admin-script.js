@@ -906,9 +906,11 @@ async function viewProjectDetail(projectId) {
         // Cargar datos en paralelo (no bloquea la UI)
         Promise.all([
             loadProjectPhases(projectId),
-            checkActiveTimerSession()
+            loadProjectStats(projectId)
         ]).then(() => {
             renderPhasesList();
+            // Verificar si hay timer activo DESPUÉS de cargar los datos
+            checkActiveTimerSession();
         });
         
     } catch (error) {
@@ -1127,14 +1129,23 @@ async function deletePhase(phaseId) {
 async function checkGlobalActiveTimer() {
     try {
         const response = await fetch(`${API_BASE}/timer.php?action=active`, {
-            credentials: 'include'
+            credentials: 'include',
+            cache: 'no-cache'
         });
         const data = await response.json();
         
         if (data.success && data.data && data.data.elapsed_seconds !== undefined) {
             // Hay un timer activo, guardar en estado global
-            currentTimerSession = data.data;
-            console.log('⏱️ Timer activo detectado:', data.data.project_name);
+            currentTimerSession = {
+                id: data.data.id,
+                project_id: data.data.project_id,
+                phase_id: data.data.phase_id,
+                project_name: data.data.project_name,
+                phase_name: data.data.phase_name,
+                start_time: data.data.start_time,
+                elapsed_seconds: data.data.elapsed_seconds
+            };
+            console.log('⏱️ Timer activo detectado:', data.data.project_name, '- Tiempo:', formatSeconds(data.data.elapsed_seconds));
         }
     } catch (error) {
         console.error('Error verificando timer global:', error);
@@ -1300,6 +1311,15 @@ document.getElementById('startTimerBtn')?.addEventListener('click', async () => 
         const data = await response.json();
         
         if (data.success) {
+            // Guardar la sesión activa con el ID que devuelve el servidor
+            currentTimerSession = {
+                id: data.session_id,
+                project_id: currentProjectDetail.id,
+                phase_id: phaseId,
+                start_time: new Date().toISOString(),
+                elapsed_seconds: 0
+            };
+            
             showNotification('⏱️ Timer iniciado', 'success');
             startTimerDisplay(0);
             document.getElementById('timerStatus').textContent = '🟢 En ejecución';
