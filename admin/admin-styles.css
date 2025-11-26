@@ -793,7 +793,41 @@
     display: flex;
     gap: 12px;
     justify-content: flex-end;
-    margin-top: 8px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(124, 58, 237, 0.1);
+}
+
+.modal-footer button {
+    min-width: 120px;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.modal-footer .btn-primary {
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.modal-footer .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+}
+
+.modal-footer .btn-secondary {
+    background: rgba(124, 58, 237, 0.08);
+    color: var(--accent-primary);
+}
+
+.modal-footer .btn-secondary:hover {
+    background: rgba(124, 58, 237, 0.15);
+    transform: translateY(-1px);
 }
 
 /* ============================================
