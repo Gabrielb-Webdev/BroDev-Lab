@@ -57,9 +57,8 @@
             <div class="admin-user">
                 <div class="admin-user-info">
                     <span id="adminName" class="admin-user-name">Cargando...</span>
-                    <span class="admin-user-role">Administrador</span>
+                    <span id="adminEmail" class="admin-user-email">email@ejemplo.com</span>
                 </div>
-                <div class="admin-avatar">GD</div>
             </div>
         </header>
 

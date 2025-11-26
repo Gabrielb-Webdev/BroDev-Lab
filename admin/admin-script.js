@@ -77,18 +77,11 @@ async function loadCurrentUser() {
             // Actualizar nombre del usuario
             document.getElementById('adminName').textContent = user.full_name || user.username;
             
-            // Actualizar rol del usuario
-            const roleElement = document.querySelector('.admin-user-role');
-            if (roleElement) {
-                const roleText = user.role === 'super_admin' ? 'Super Administrador' : 'Administrador';
-                roleElement.textContent = roleText;
+            // Actualizar email del usuario
+            const emailElement = document.getElementById('adminEmail');
+            if (emailElement && user.email) {
+                emailElement.textContent = user.email;
             }
-            
-            // Actualizar avatar con iniciales
-            const initials = user.full_name 
-                ? user.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-                : user.username.substring(0, 2).toUpperCase();
-            document.querySelector('.admin-avatar').textContent = initials;
         }
     } catch (error) {
         console.error('Error cargando usuario:', error);
