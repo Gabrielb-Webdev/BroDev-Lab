@@ -411,12 +411,16 @@ async function createClient(formData) {
         const data = await response.json();
         
         if (data.success) {
-            showNotification(`Cliente creado. Código: ${data.data.access_code}`, 'success');
+            // La API devuelve access_code directamente, no dentro de data.data
+            const accessCode = data.access_code || 'N/A';
+            showNotification(`✅ Cliente creado. Código de acceso: ${accessCode}`, 'success');
             closeModal('clientModal');
+            document.getElementById('clientForm').reset();
             await loadClients();
             renderClientsList();
+            updateDashboard();
         } else {
-            showNotification(data.message || 'Error al crear cliente', 'error');
+            showNotification(data.message || data.error || 'Error al crear cliente', 'error');
         }
     } catch (error) {
         console.error('Error:', error);

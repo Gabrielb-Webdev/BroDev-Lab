@@ -264,6 +264,6 @@
         </div>
     </div>
 
-    <script src="admin-script.js?v=0.8"></script>
+    <script src="admin-script.js?v=0.9"></script>
 </body>
 </html>
