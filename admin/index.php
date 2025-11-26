@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - BroDev Lab</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-    <link rel="stylesheet" href="../styles.css?v=0.8">
-    <link rel="stylesheet" href="admin-styles.css?v=0.8">
+    <link rel="stylesheet" href="../styles.css?v=1.0">
+    <link rel="stylesheet" href="admin-styles.css?v=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
@@ -264,6 +264,185 @@
         </div>
     </div>
 
-    <script src="admin-script.js?v=0.9"></script>
+    <!-- Modal detallado de proyecto -->
+    <div id="projectDetailModal" class="modal modal-large">
+        <div class="modal-content modal-content-large">
+            <div class="modal-header">
+                <h2 id="projectDetailTitle">Detalles del Proyecto</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            
+            <!-- Tabs Navigation -->
+            <div class="tabs-nav">
+                <button class="tab-btn active" data-tab="overview">📊 General</button>
+                <button class="tab-btn" data-tab="phases">🎯 Fases</button>
+                <button class="tab-btn" data-tab="timer">⏱️ Timer</button>
+                <button class="tab-btn" data-tab="stats">📈 Estadísticas</button>
+            </div>
+
+            <!-- Tab: General -->
+            <div id="tab-overview" class="tab-content active">
+                <div class="project-header-info">
+                    <div class="info-row">
+                        <div class="info-item">
+                            <label>Cliente:</label>
+                            <span id="detail-client">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Estado:</label>
+                            <select id="detail-status" class="status-dropdown">
+                                <option value="quote">💭 Cotización</option>
+                                <option value="pending_approval">⏳ Pendiente Aprobación</option>
+                                <option value="approved">✅ Aprobado</option>
+                                <option value="in_progress">🚀 En Progreso</option>
+                                <option value="review">👀 En Revisión</option>
+                                <option value="testing">🧪 Testing</option>
+                                <option value="client_review">📋 Revisión Cliente</option>
+                                <option value="completed">✔️ Completado</option>
+                                <option value="on_hold">⏸️ En Espera</option>
+                                <option value="cancelled">❌ Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="info-item">
+                            <label>Tipo:</label>
+                            <span id="detail-type">-</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-item">
+                            <label>Presupuesto:</label>
+                            <span id="detail-budget">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Tarifa/Hora:</label>
+                            <span id="detail-hourly-rate">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Tiempo Total:</label>
+                            <span id="detail-total-time">-</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-item full-width">
+                            <label>Descripción:</label>
+                            <p id="detail-description">-</p>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <label>Progreso: <span id="detail-progress-text">0%</span></label>
+                        <div class="progress-bar">
+                            <div id="detail-progress-bar" class="progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Fases -->
+            <div id="tab-phases" class="tab-content">
+                <div class="phases-header">
+                    <button id="addPhaseBtn" class="btn-action btn-sm">➕ Nueva Fase</button>
+                </div>
+                <div id="phasesList" class="phases-list">
+                    <!-- Fases se cargarán dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Tab: Timer -->
+            <div id="tab-timer" class="tab-content">
+                <div class="timer-container">
+                    <div class="timer-display">
+                        <div class="timer-icon">⏱️</div>
+                        <div class="timer-time" id="timerDisplay">00:00:00</div>
+                        <div class="timer-status" id="timerStatus">Detenido</div>
+                    </div>
+                    <div class="timer-controls">
+                        <select id="timerPhaseSelect" class="form-control">
+                            <option value="">Seleccionar fase...</option>
+                        </select>
+                        <input type="text" id="timerDescription" class="form-control" placeholder="Descripción de la sesión...">
+                        <div class="timer-buttons">
+                            <button id="startTimerBtn" class="btn-timer btn-timer-start">▶️ Iniciar</button>
+                            <button id="stopTimerBtn" class="btn-timer btn-timer-stop" style="display:none;">⏹️ Detener</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="timer-history">
+                    <h3>Historial de Sesiones</h3>
+                    <div id="timerHistoryList"></div>
+                </div>
+            </div>
+
+            <!-- Tab: Estadísticas -->
+            <div id="tab-stats" class="tab-content">
+                <div class="stats-grid-detail">
+                    <div class="stat-card">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-value" id="stats-total-time">0h</div>
+                        <div class="stat-label">Tiempo Total</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-value" id="stats-total-cost">$0</div>
+                        <div class="stat-label">Costo Total</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-value" id="stats-phases">0/0</div>
+                        <div class="stat-label">Fases Completadas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-value" id="stats-progress">0%</div>
+                        <div class="stat-label">Progreso</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Tiempo por Fase</h3>
+                    <div id="phaseTimeChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para nueva fase -->
+    <div id="phaseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nueva Fase</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="phaseForm" class="modal-form">
+                <input type="hidden" id="phaseProjectId" name="project_id">
+                <div class="form-group">
+                    <label>Nombre de la Fase *</label>
+                    <input type="text" name="phase_name" required class="form-control" placeholder="ej: Diseño de UI/UX">
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea name="description" rows="3" class="form-control" placeholder="Detalles de esta fase..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Horas Estimadas</label>
+                    <input type="number" name="estimated_hours" step="0.5" class="form-control" placeholder="ej: 10">
+                </div>
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select name="status" class="form-control">
+                        <option value="not_started">⚪ No Iniciada</option>
+                        <option value="in_progress">🔵 En Progreso</option>
+                        <option value="completed">✅ Completada</option>
+                        <option value="paused">⏸️ Pausada</option>
+                        <option value="blocked">🔴 Bloqueada</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary modal-close">Cancelar</button>
+                    <button type="submit" class="btn-primary">Crear Fase</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin-script.js?v=1.0"></script>
 </body>
 </html>

@@ -253,8 +253,8 @@ function renderProjectsList() {
                             <td>${formatSeconds(project.total_time_seconds || 0)}</td>
                             <td>$${parseFloat(project.budget || 0).toFixed(2)}</td>
                             <td>
-                                <button class="btn-secondary" onclick="viewProject(${project.id})">👁️</button>
-                                <button class="btn-danger" onclick="deleteProject(${project.id})">🗑️</button>
+                                <button class="btn-secondary" onclick="viewProjectDetail(${project.id})" title="Ver detalles completos">📊</button>
+                                <button class="btn-danger" onclick="deleteProject(${project.id})" title="Eliminar">🗑️</button>
                             </td>
                         </tr>
                     `).join('')}
@@ -865,8 +865,480 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
+// ============================================
+// MODAL DETALLADO DE PROYECTO
+// ============================================
+let currentProjectDetail = null;
+let currentPhases = [];
+let projectTimerInterval = null;
+let timerStartTime = null;
+let currentTimerSession = null;
+
+async function viewProjectDetail(projectId) {
+    try {
+        currentProjectDetail = projects.find(p => p.id === projectId);
+        if (!currentProjectDetail) return;
+        
+        // Cargar datos del proyecto
+        await loadProjectPhases(projectId);
+        await loadProjectStats(projectId);
+        
+        // Abrir modal
+        openModal('projectDetailModal');
+        
+        // Llenar información general
+        document.getElementById('projectDetailTitle').textContent = currentProjectDetail.project_name;
+        document.getElementById('detail-client').textContent = currentProjectDetail.client_name || 'N/A';
+        document.getElementById('detail-status').value = currentProjectDetail.status;
+        document.getElementById('detail-type').textContent = formatProjectType(currentProjectDetail.project_type);
+        document.getElementById('detail-budget').textContent = `$${parseFloat(currentProjectDetail.budget || 0).toFixed(2)}`;
+        document.getElementById('detail-hourly-rate').textContent = `$${parseFloat(currentProjectDetail.hourly_rate || 0).toFixed(2)}`;
+        document.getElementById('detail-total-time').textContent = formatSeconds(currentProjectDetail.total_time_seconds || 0);
+        document.getElementById('detail-description').textContent = currentProjectDetail.description || 'Sin descripción';
+        
+        const progress = parseFloat(currentProjectDetail.progress_percentage || 0);
+        document.getElementById('detail-progress-text').textContent = `${progress.toFixed(1)}%`;
+        document.getElementById('detail-progress-bar').style.width = `${progress}%`;
+        
+        // Evento para cambio de estado
+        document.getElementById('detail-status').addEventListener('change', async (e) => {
+            await updateProjectStatus(projectId, e.target.value);
+        });
+        
+        // Configurar tabs
+        setupTabs();
+        
+        // Renderizar fases
+        renderPhasesList();
+        
+        // Verificar sesión activa
+        await checkActiveTimerSession();
+        
+    } catch (error) {
+        console.error('Error al cargar detalles del proyecto:', error);
+        showNotification('Error al cargar el proyecto', 'error');
+    }
+}
+
+function setupTabs() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.dataset.tab;
+            
+            // Remover active de todos
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Activar el seleccionado
+            btn.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            // Cargar datos específicos del tab
+            if (tabName === 'stats') {
+                renderProjectStats();
+            } else if (tabName === 'timer') {
+                loadTimerHistory();
+            }
+        });
+    });
+}
+
+async function updateProjectStatus(projectId, newStatus) {
+    try {
+        const response = await fetch(`${API_BASE}/projects.php`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                id: projectId,
+                status: newStatus
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('✅ Estado actualizado', 'success');
+            await loadProjects();
+            updateDashboard();
+        } else {
+            showNotification('Error al actualizar estado', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al actualizar estado', 'error');
+    }
+}
+
+// ============================================
+// GESTIÓN DE FASES
+// ============================================
+async function loadProjectPhases(projectId) {
+    try {
+        const response = await fetch(`${API_BASE}/phases.php?project_id=${projectId}`, {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            currentPhases = data.data || [];
+        }
+    } catch (error) {
+        console.error('Error cargando fases:', error);
+    }
+}
+
+function renderPhasesList() {
+    const container = document.getElementById('phasesList');
+    const timerPhaseSelect = document.getElementById('timerPhaseSelect');
+    
+    if (currentPhases.length === 0) {
+        container.innerHTML = `
+            <div class="empty-list">
+                <div class="empty-list-icon">🎯</div>
+                <div class="empty-list-text">No hay fases creadas</div>
+                <p>Agrega fases para organizar mejor tu proyecto</p>
+            </div>
+        `;
+        timerPhaseSelect.innerHTML = '<option value="">Sin fase específica</option>';
+        return;
+    }
+    
+    // Renderizar lista de fases
+    container.innerHTML = currentPhases.map((phase, index) => `
+        <div class="phase-item" data-phase-id="${phase.id}">
+            <div class="phase-header">
+                <div class="phase-title">
+                    <div class="phase-number">${phase.phase_number}</div>
+                    <div class="phase-name">${phase.phase_name}</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span class="phase-status-badge ${phase.status}">${formatPhaseStatus(phase.status)}</span>
+                    <div class="phase-actions">
+                        <button class="btn-icon-only btn-play" onclick="startTimerForPhase(${phase.id})" title="Iniciar timer">▶️</button>
+                        <button class="btn-icon-only btn-edit" onclick="editPhase(${phase.id})" title="Editar">✏️</button>
+                        <button class="btn-icon-only btn-delete" onclick="deletePhase(${phase.id})" title="Eliminar">🗑️</button>
+                    </div>
+                </div>
+            </div>
+            ${phase.description ? `<p style="color: var(--text-secondary); margin: 8px 0;">${phase.description}</p>` : ''}
+            <div class="phase-details">
+                <div class="phase-detail-item">
+                    <span class="phase-detail-label">Estimado</span>
+                    <span class="phase-detail-value">${phase.estimated_hours || 0}h</span>
+                </div>
+                <div class="phase-detail-item">
+                    <span class="phase-detail-label">Tiempo Real</span>
+                    <span class="phase-detail-value">${(phase.total_hours || 0).toFixed(2)}h</span>
+                </div>
+                <div class="phase-detail-item">
+                    <span class="phase-detail-label">Diferencia</span>
+                    <span class="phase-detail-value" style="color: ${(phase.total_hours || 0) > (phase.estimated_hours || 0) ? '#ef4444' : '#22c55e'}">
+                        ${((phase.total_hours || 0) - (phase.estimated_hours || 0)).toFixed(2)}h
+                    </span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    // Llenar select de fases para timer
+    timerPhaseSelect.innerHTML = '<option value="">Sin fase específica</option>' +
+        currentPhases.map(phase => `<option value="${phase.id}">${phase.phase_name}</option>`).join('');
+}
+
+function formatPhaseStatus(status) {
+    const statusMap = {
+        'not_started': '⚪ No Iniciada',
+        'in_progress': '🔵 En Progreso',
+        'completed': '✅ Completada',
+        'paused': '⏸️ Pausada',
+        'blocked': '🔴 Bloqueada'
+    };
+    return statusMap[status] || status;
+}
+
+// Abrir modal para nueva fase
+document.getElementById('addPhaseBtn')?.addEventListener('click', () => {
+    if (!currentProjectDetail) return;
+    document.getElementById('phaseProjectId').value = currentProjectDetail.id;
+    openModal('phaseModal');
+});
+
+// Form de fase
+document.getElementById('phaseForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    try {
+        const response = await fetch(`${API_BASE}/phases.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('✅ Fase creada exitosamente', 'success');
+            closeModal('phaseModal');
+            e.target.reset();
+            await loadProjectPhases(currentProjectDetail.id);
+            renderPhasesList();
+        } else {
+            showNotification(result.error || 'Error al crear fase', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al crear fase', 'error');
+    }
+});
+
+async function deletePhase(phaseId) {
+    if (!confirm('¿Estás seguro de eliminar esta fase?')) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/phases.php`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ id: phaseId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('✅ Fase eliminada', 'success');
+            await loadProjectPhases(currentProjectDetail.id);
+            renderPhasesList();
+        } else {
+            showNotification('Error al eliminar fase', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al eliminar fase', 'error');
+    }
+}
+
+// ============================================
+// SISTEMA DE TIMER
+// ============================================
+async function checkActiveTimerSession() {
+    try {
+        const response = await fetch(`${API_BASE}/timer.php?action=active`, {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            currentTimerSession = data.data;
+            startTimerDisplay(data.data.elapsed_seconds);
+            document.getElementById('timerStatus').textContent = '🟢 En ejecución';
+            document.getElementById('startTimerBtn').style.display = 'none';
+            document.getElementById('stopTimerBtn').style.display = 'block';
+        } else {
+            stopTimerDisplay();
+        }
+    } catch (error) {
+        console.error('Error verificando timer:', error);
+    }
+}
+
+function startTimerDisplay(elapsedSeconds = 0) {
+    timerStartTime = Date.now() - (elapsedSeconds * 1000);
+    
+    if (projectTimerInterval) clearInterval(projectTimerInterval);
+    
+    projectTimerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - timerStartTime) / 1000);
+        document.getElementById('timerDisplay').textContent = formatSeconds(elapsed);
+    }, 1000);
+}
+
+function stopTimerDisplay() {
+    if (projectTimerInterval) {
+        clearInterval(projectTimerInterval);
+        projectTimerInterval = null;
+    }
+    document.getElementById('timerDisplay').textContent = '00:00:00';
+    document.getElementById('timerStatus').textContent = 'Detenido';
+    document.getElementById('startTimerBtn').style.display = 'block';
+    document.getElementById('stopTimerBtn').style.display = 'none';
+    currentTimerSession = null;
+}
+
+document.getElementById('startTimerBtn')?.addEventListener('click', async () => {
+    if (!currentProjectDetail) return;
+    
+    const phaseId = document.getElementById('timerPhaseSelect').value;
+    const description = document.getElementById('timerDescription').value;
+    
+    try {
+        const response = await fetch(`${API_BASE}/timer.php?action=start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                project_id: currentProjectDetail.id,
+                phase_id: phaseId || null,
+                description: description
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('⏱️ Timer iniciado', 'success');
+            startTimerDisplay(0);
+            document.getElementById('timerStatus').textContent = '🟢 En ejecución';
+            document.getElementById('startTimerBtn').style.display = 'none';
+            document.getElementById('stopTimerBtn').style.display = 'block';
+        } else {
+            showNotification(data.error || 'Error al iniciar timer', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al iniciar timer', 'error');
+    }
+});
+
+document.getElementById('stopTimerBtn')?.addEventListener('click', async () => {
+    const notes = prompt('Agregar notas sobre esta sesión (opcional):');
+    
+    try {
+        const response = await fetch(`${API_BASE}/timer.php?action=stop`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ notes: notes || '' })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification(`⏹️ Timer detenido - ${data.duration_hours}h registradas`, 'success');
+            stopTimerDisplay();
+            await loadProjects();
+            await loadProjectPhases(currentProjectDetail.id);
+            renderPhasesList();
+            loadTimerHistory();
+            updateDashboard();
+        } else {
+            showNotification('Error al detener timer', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al detener timer', 'error');
+    }
+});
+
+function startTimerForPhase(phaseId) {
+    // Cambiar a tab de timer
+    document.querySelector('.tab-btn[data-tab="timer"]').click();
+    // Seleccionar la fase
+    document.getElementById('timerPhaseSelect').value = phaseId;
+    // Hacer scroll al timer
+    document.querySelector('.timer-container').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function loadTimerHistory() {
+    if (!currentProjectDetail) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/timer.php?action=history&project_id=${currentProjectDetail.id}`, {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            renderTimerHistory(data.data || []);
+        }
+    } catch (error) {
+        console.error('Error cargando historial:', error);
+    }
+}
+
+function renderTimerHistory(sessions) {
+    const container = document.getElementById('timerHistoryList');
+    
+    if (sessions.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No hay sesiones registradas</p>';
+        return;
+    }
+    
+    container.innerHTML = sessions.map(session => `
+        <div class="timer-session-item">
+            <div class="session-info">
+                <h4>${session.phase_name || 'Sin fase'}</h4>
+                <p>${new Date(session.start_time).toLocaleDateString()} - ${session.session_description || 'Sin descripción'}</p>
+                ${session.notes ? `<p style="font-style: italic;">${session.notes}</p>` : ''}
+            </div>
+            <div class="session-duration">${formatSeconds(session.duration_seconds)}</div>
+        </div>
+    `).join('');
+}
+
+// ============================================
+// ESTADÍSTICAS DEL PROYECTO
+// ============================================
+async function loadProjectStats(projectId) {
+    // Las estadísticas ya vienen con el proyecto y las fases
+    // Solo necesitamos calcularlas
+}
+
+function renderProjectStats() {
+    if (!currentProjectDetail || !currentPhases) return;
+    
+    const totalTime = currentProjectDetail.total_time_seconds || 0;
+    const totalCost = (totalTime / 3600) * (currentProjectDetail.hourly_rate || 0);
+    const completedPhases = currentPhases.filter(p => p.status === 'completed').length;
+    const progress = parseFloat(currentProjectDetail.progress_percentage || 0);
+    
+    document.getElementById('stats-total-time').textContent = formatSeconds(totalTime);
+    document.getElementById('stats-total-cost').textContent = `$${totalCost.toFixed(2)}`;
+    document.getElementById('stats-phases').textContent = `${completedPhases}/${currentPhases.length}`;
+    document.getElementById('stats-progress').textContent = `${progress.toFixed(1)}%`;
+    
+    // Renderizar gráfico de tiempo por fase
+    renderPhaseTimeChart();
+}
+
+function renderPhaseTimeChart() {
+    const container = document.getElementById('phaseTimeChart');
+    
+    if (currentPhases.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No hay fases para mostrar</p>';
+        return;
+    }
+    
+    const maxTime = Math.max(...currentPhases.map(p => p.total_time_seconds || 0));
+    
+    container.innerHTML = currentPhases.map(phase => {
+        const percentage = maxTime > 0 ? ((phase.total_time_seconds || 0) / maxTime) * 100 : 0;
+        const hours = ((phase.total_time_seconds || 0) / 3600).toFixed(2);
+        
+        return `
+            <div class="chart-bar">
+                <div class="chart-bar-label">${phase.phase_name}</div>
+                <div class="chart-bar-container">
+                    <div class="chart-bar-fill" style="width: ${percentage}%">
+                        ${hours}h
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
 // Hacer funciones disponibles globalmente
 window.viewProject = viewProject;
+window.viewProjectDetail = viewProjectDetail;
 window.deleteProject = deleteProject;
 window.deleteClient = deleteClient;
 window.copyAccessCode = copyAccessCode;
+window.deletePhase = deletePhase;
+window.startTimerForPhase = startTimerForPhase;
