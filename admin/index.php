@@ -356,7 +356,7 @@
                             Fase <span style="color: #ef4444;">*</span>
                         </label>
                         <select id="timerPhaseSelect" class="form-control" required>
-                            <option value="">Seleccionar fase...</option>
+                            <option value="" disabled selected>Seleccionar fase...</option>
                         </select>
                         <input type="text" id="timerDescription" class="form-control" placeholder="Descripción de la sesión (opcional)..." style="margin-top: 12px;">
                         <div class="timer-buttons">
