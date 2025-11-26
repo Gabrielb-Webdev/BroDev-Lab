@@ -6,7 +6,7 @@
     <title>Admin Panel - BroDev Lab</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <link rel="stylesheet" href="../styles.css?v=1.0">
-    <link rel="stylesheet" href="admin-styles.css?v=1.8">
+    <link rel="stylesheet" href="admin-styles.css?v=1.9">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
@@ -442,6 +442,6 @@
         </div>
     </div>
 
-    <script src="admin-script.js?v=2.4"></script>
+    <script src="admin-script.js?v=2.5"></script>
 </body>
 </html>

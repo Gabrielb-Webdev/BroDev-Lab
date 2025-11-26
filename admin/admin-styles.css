@@ -776,15 +776,29 @@ select.form-control:hover {
 }
 
 select.form-control option {
-    padding: 12px;
-    background: var(--card-background);
-    color: var(--text-primary);
+    padding: 14px 20px;
+    background: #1a0b2e;
+    color: #ffffff;
     font-weight: 600;
+    line-height: 1.6;
+    border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+}
+
+select.form-control option:hover,
+select.form-control option:focus,
+select.form-control option:checked {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.3) 0%, rgba(124, 58, 237, 0.2) 100%);
+    color: #ffffff;
 }
 
 select.form-control option:disabled {
-    color: var(--text-secondary);
+    color: #94a3b8;
     font-style: italic;
+    background: rgba(30, 27, 75, 0.5);
+}
+
+select.form-control option:last-child {
+    border-bottom: none;
 }
 
 .btn-success {
@@ -1115,15 +1129,24 @@ select.form-control option:disabled {
 }
 
 .status-dropdown option {
-    padding: 12px 16px;
-    background: var(--card-background);
-    color: var(--text-primary);
+    padding: 14px 20px;
+    background: #1a0b2e;
+    color: #ffffff;
     font-weight: 600;
     font-size: 0.95rem;
+    line-height: 1.6;
+    border-bottom: 1px solid rgba(124, 58, 237, 0.1);
 }
 
-.status-dropdown option:hover {
-    background: rgba(124, 58, 237, 0.1);
+.status-dropdown option:hover,
+.status-dropdown option:focus,
+.status-dropdown option:checked {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.3) 0%, rgba(124, 58, 237, 0.2) 100%);
+    color: #ffffff;
+}
+
+.status-dropdown option:last-child {
+    border-bottom: none;
 }
 
 /* Progress Bar */
@@ -1282,10 +1305,23 @@ select.form-control option:disabled {
 }
 
 .phase-status-select option {
-    padding: 12px;
-    background: var(--card-background);
-    color: var(--text-primary);
+    padding: 14px 20px;
+    background: #1a0b2e;
+    color: #ffffff;
     font-weight: 600;
+    line-height: 1.6;
+    border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+}
+
+.phase-status-select option:hover,
+.phase-status-select option:focus,
+.phase-status-select option:checked {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.3) 0%, rgba(124, 58, 237, 0.2) 100%);
+    color: #ffffff;
+}
+
+.phase-status-select option:last-child {
+    border-bottom: none;
 }
 
 .phase-details {
