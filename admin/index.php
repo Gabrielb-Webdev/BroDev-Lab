@@ -562,9 +562,15 @@
         </div>
     </div>
 
+    <!-- WebSocket Real-Time System -->
+    <script src="websocket-client.js?v=1.0"></script>
+    <script src="realtime-websocket.js?v=1.0"></script>
+    
+    <!-- Dynamic Table System -->
     <script src="dynamic-system.js?v=1.0"></script>
     <script src="field-editor.js?v=1.0"></script>
     <script src="admin-script.js?v=2.9"></script>
+    
     <!-- Ejemplos de uso (solo en desarrollo) -->
     <script src="examples-dynamic-system.js?v=1.0"></script>
     

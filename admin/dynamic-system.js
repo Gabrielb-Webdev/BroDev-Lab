@@ -505,8 +505,8 @@ async function initDynamicSystem() {
     // Cargar datos iniciales
     await loadProjectsData();
     
-    // Iniciar sincronización en tiempo real
-    realtimeSync = new RealtimeSync();
+    // Iniciar sincronización en tiempo real (WebSocket + Polling Fallback)
+    realtimeSync = new RealtimeSyncWebSocket();
     realtimeSync.onUpdate((updates) => {
         handleRealtimeUpdates(updates);
     });
@@ -552,7 +552,8 @@ function handleRealtimeUpdates(updates) {
 }
 
 // Exportar para uso global
-window.RealtimeSync = RealtimeSync;
+window.RealtimeSync = RealtimeSync; // Mantener por compatibilidad
+window.RealtimeSyncWebSocket = RealtimeSyncWebSocket; // Nueva clase híbrida
 window.CustomFieldsManager = CustomFieldsManager;
 window.DynamicTableRenderer = DynamicTableRenderer;
 window.initDynamicSystem = initDynamicSystem;
