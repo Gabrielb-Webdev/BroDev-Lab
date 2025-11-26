@@ -2,6 +2,22 @@
 
 Landing page moderna y profesional para tu emprendimiento de desarrollo web. Diseñada con colores oscuros, violeta y azul, con animaciones 3D, efectos parallax y diseño totalmente responsivo.
 
+## 🔧 Instalación Rápida de Actualizaciones
+
+**¿Primera vez o necesitas actualizar la base de datos?**
+
+👉 **[Haz clic aquí para instalar/actualizar automáticamente](install-updates.php)** 👈
+
+Esta herramienta instalará:
+- ✅ Estados de proyectos actualizados (10 estados con emojis)
+- ✅ Migración automática de datos antiguos
+- ✅ Configuración de zona horaria Argentina
+- ✅ Verificación de integridad de tablas
+
+**Solo un clic y listo. Sin configuraciones manuales.**
+
+---
+
 ## ✨ Características
 
 - **Diseño Moderno**: Paleta de colores oscuros con violeta y azul como principales
