@@ -6,7 +6,7 @@
     <title>Admin Panel - BroDev Lab</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <link rel="stylesheet" href="../styles.css?v=1.0">
-    <link rel="stylesheet" href="admin-styles.css?v=2.3">
+    <link rel="stylesheet" href="admin-styles.css?v=2.4">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
@@ -262,7 +262,7 @@
 
     <!-- Modal detallado de proyecto -->
     <div id="projectDetailModal" class="modal modal-large">
-        <div class="modal-content modal-content-large">
+        <div class="modal-content modal-content-large" style="position: relative;">
             <div class="modal-header">
                 <h2 id="projectDetailTitle">Detalles del Proyecto</h2>
                 <button class="modal-close">&times;</button>
@@ -286,23 +286,21 @@
                         </div>
                         <div class="info-item">
                             <label>Estado:</label>
-                            <div style="position: relative;">
-                                <select id="detail-status" class="status-dropdown">
-                                    <option value="quote">💭 Cotización</option>
-                                    <option value="pending_approval">⏳ Pendiente Aprobación</option>
-                                    <option value="approved">✅ Aprobado</option>
-                                    <option value="in_progress">🚀 En Progreso</option>
-                                    <option value="review">👀 En Revisión</option>
-                                    <option value="testing">🧪 Testing</option>
-                                    <option value="client_review">📋 Revisión Cliente</option>
-                                    <option value="completed">✔️ Completado</option>
-                                    <option value="on_hold">⏸️ En Espera</option>
-                                    <option value="cancelled">❌ Cancelado</option>
-                                </select>
-                                <button id="saveStatusBtn" class="btn-icon-small" style="position: absolute; bottom: -45px; right: 0; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);" title="Guardar estado">
-                                    💾 Guardar
-                                </button>
-                            </div>
+                            <select id="detail-status" class="status-dropdown">
+                                <option value="quote">💭 Cotización</option>
+                                <option value="pending_approval">⏳ Pendiente Aprobación</option>
+                                <option value="approved">✅ Aprobado</option>
+                                <option value="in_progress">🚀 En Progreso</option>
+                                <option value="review">👀 En Revisión</option>
+                                <option value="testing">🧪 Testing</option>
+                                <option value="client_review">📋 Revisión Cliente</option>
+                                <option value="completed">✔️ Completado</option>
+                                <option value="on_hold">⏸️ En Espera</option>
+                                <option value="cancelled">❌ Cancelado</option>
+                            </select>
+                            <button id="saveStatusBtn" style="position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 14px 28px; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; font-size: 1rem; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4); z-index: 1000;\" title="Guardar estado">
+                                💾 Guardar Estado
+                            </button>
                         </div>
                         <div class="info-item">
                             <label>Tipo:</label>
@@ -444,6 +442,6 @@
         </div>
     </div>
 
-    <script src="admin-script.js?v=2.7"></script>
+    <script src="admin-script.js?v=2.8"></script>
 </body>
 </html>
