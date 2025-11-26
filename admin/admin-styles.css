@@ -1268,8 +1268,9 @@
 .timer-time {
     font-size: 4rem;
     font-weight: 700;
-    color: #000000;
+    color: #ffffff;
     margin-bottom: 8px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .timer-status {

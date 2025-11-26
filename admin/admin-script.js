@@ -1176,6 +1176,7 @@ async function checkActiveTimerSession() {
 function startTimerDisplay(elapsedSeconds = 0) {
     // Asegurar que elapsedSeconds sea un número válido
     const validElapsed = Math.max(0, parseInt(elapsedSeconds) || 0);
+    // Guardar el tiempo de inicio en el cliente basado en el servidor
     timerStartTime = Date.now() - (validElapsed * 1000);
     
     if (projectTimerInterval) clearInterval(projectTimerInterval);
@@ -1186,17 +1187,39 @@ function startTimerDisplay(elapsedSeconds = 0) {
         timerDisplayEl.textContent = formatSeconds(validElapsed);
     }
     
+    // Actualizar cada segundo
     projectTimerInterval = setInterval(() => {
         if (!timerStartTime) {
             clearInterval(projectTimerInterval);
             return;
         }
+        // Calcular tiempo transcurrido desde que se inició (basado en tiempo del servidor)
         const elapsed = Math.max(0, Math.floor((Date.now() - timerStartTime) / 1000));
         const timerEl = document.getElementById('timerDisplay');
         if (timerEl) {
             timerEl.textContent = formatSeconds(elapsed);
         }
     }, 1000);
+    
+    // Sincronizar con el servidor cada 30 segundos para corregir cualquier drift
+    setInterval(async () => {
+        if (currentTimerSession) {
+            try {
+                const response = await fetch(`${API_BASE}/timer.php?action=active`, {
+                    credentials: 'include',
+                    cache: 'no-cache'
+                });
+                const data = await response.json();
+                if (data.success && data.data && data.data.elapsed_seconds !== undefined) {
+                    // Actualizar el tiempo de inicio basado en el servidor
+                    const serverElapsed = parseInt(data.data.elapsed_seconds) || 0;
+                    timerStartTime = Date.now() - (serverElapsed * 1000);
+                }
+            } catch (error) {
+                console.error('Error sincronizando timer:', error);
+            }
+        }
+    }, 30000);
 }
 
 function stopTimerDisplay() {
@@ -1255,6 +1278,12 @@ document.getElementById('startTimerBtn')?.addEventListener('click', async () => 
 });
 
 document.getElementById('stopTimerBtn')?.addEventListener('click', async () => {
+    if (!currentTimerSession) return;
+    
+    if (!confirm('¿Deseas detener el timer? El tiempo se guardará en el proyecto.')) {
+        return;
+    }
+    
     const notes = prompt('Agregar notas sobre esta sesión (opcional):');
     
     try {
@@ -1268,12 +1297,17 @@ document.getElementById('stopTimerBtn')?.addEventListener('click', async () => {
         const data = await response.json();
         
         if (data.success) {
-            showNotification(`⏹️ Timer detenido - ${data.duration_hours}h registradas`, 'success');
+            showNotification(`⏹️ Timer detenido - ${data.duration_hours || '0'}h registradas`, 'success');
             stopTimerDisplay();
+            // Limpiar sesión global
+            currentTimerSession = null;
+            // Recargar datos
             await loadProjects();
-            await loadProjectPhases(currentProjectDetail.id);
-            renderPhasesList();
-            loadTimerHistory();
+            if (currentProjectDetail) {
+                await loadProjectPhases(currentProjectDetail.id);
+                renderPhasesList();
+                loadTimerHistory();
+            }
             updateDashboard();
         } else {
             showNotification('Error al detener timer', 'error');
