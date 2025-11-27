@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tareas - BroDev Lab</title>
+    <link rel="stylesheet" href="board-styles.css?v=1.2">
+    <base href="/admin/">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+            overflow-x: hidden;
+        }
+        
+        /* Lista container */
+        .list-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Tabla de tareas */
+        .tasks-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .table-header {
+            display: grid;
+            grid-template-columns: 40px 2fr 1fr 120px 120px 150px 100px;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e5e7eb;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+        
+        .task-row {
+            display: grid;
+            grid-template-columns: 40px 2fr 1fr 120px 120px 150px 100px;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            align-items: center;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        
+        .task-row:hover {
+            background: #f9fafb;
+        }
+        
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .task-title-col {
+            font-weight: 500;
+            color: #1f2937;
+        }
+        
+        .task-description-col {
+            font-size: 0.85rem;
+            color: #6b7280;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .task-status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        .status-todo {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        .status-in_progress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-review {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-done {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .priority-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        
+        .priority-urgent {
+            background: #ef4444;
+        }
+        
+        .priority-high {
+            background: #f59e0b;
+        }
+        
+        .priority-normal {
+            background: #3b82f6;
+        }
+        
+        .priority-low {
+            background: #10b981;
+        }
+        
+        .task-assignee-col {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+        
+        .assignee-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .task-date-col {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #9ca3af;
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Filtros */
+        .list-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            padding: 0.6rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header con navegación de vistas -->
+    <div class="view-header">
+        <div class="view-tabs">
+            <a href="/admin/index.php" class="view-tab">
+                <span class="icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="/admin/list-view.html" class="view-tab active">
+                <span class="icon">📝</span>
+                <span>Lista</span>
+            </a>
+            <a href="/admin/board-view.html" class="view-tab">
+                <span class="icon">📋</span>
+                <span>Board</span>
+            </a>
+            <a href="#" class="view-tab disabled" title="Próximamente" onclick="return false;">
+                <span class="icon">📅</span>
+                <span>Calendario</span>
+            </a>
+            <a href="#" class="view-tab disabled" title="Próximamente" onclick="return false;">
+                <span class="icon">📈</span>
+                <span>Gantt</span>
+            </a>
+        </div>
+        
+        <div class="view-actions">
+            <div class="search-box">
+                <input type="text" placeholder="Buscar tareas..." id="searchTasks">
+                <kbd>Ctrl+K</kbd>
+            </div>
+            <button class="btn-primary" id="newTaskBtn">
+                <span>➕</span> Nueva Tarea
+            </button>
+        </div>
+    </div>
+
+    <!-- Lista de tareas -->
+    <div class="list-container">
+        <div class="list-filters">
+            <select class="filter-select" id="filterStatus">
+                <option value="">Todos los estados</option>
+                <option value="todo">Por Hacer</option>
+                <option value="in_progress">En Progreso</option>
+                <option value="review">En Revisión</option>
+                <option value="done">Completado</option>
+            </select>
+            
+            <select class="filter-select" id="filterPriority">
+                <option value="">Todas las prioridades</option>
+                <option value="urgent">Urgente</option>
+                <option value="high">Alta</option>
+                <option value="normal">Normal</option>
+                <option value="low">Baja</option>
+            </select>
+            
+            <select class="filter-select" id="filterProject">
+                <option value="">Todos los proyectos</option>
+            </select>
+        </div>
+
+        <div class="tasks-table">
+            <div class="table-header">
+                <div></div>
+                <div>Tarea</div>
+                <div>Descripción</div>
+                <div>Estado</div>
+                <div>Prioridad</div>
+                <div>Asignado a</div>
+                <div>Vencimiento</div>
+            </div>
+            <div id="tasksList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <div>Cargando tareas...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' ? '../api' : '/api';
+        let allTasks = [];
+
+        // Cargar tareas al inicio
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadTasks();
+            setupFilters();
+        });
+
+        async function loadTasks() {
+            try {
+                const response = await fetch(`${API_BASE}/tasks.php`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    allTasks = result.data;
+                    renderTasks(allTasks);
+                    console.log(`✅ ${allTasks.length} tareas cargadas`);
+                } else {
+                    showError('Error al cargar tareas');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Error de conexión');
+            }
+        }
+
+        function renderTasks(tasks) {
+            const container = document.getElementById('tasksList');
+            
+            if (tasks.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <div>No hay tareas que mostrar</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = tasks.map(task => `
+                <div class="task-row" onclick="viewTask(${task.id})">
+                    <div>
+                        <input type="checkbox" class="task-checkbox" ${task.status === 'done' ? 'checked' : ''} onclick="event.stopPropagation(); toggleTaskStatus(${task.id})">
+                    </div>
+                    <div class="task-title-col">${escapeHtml(task.title)}</div>
+                    <div class="task-description-col">${escapeHtml(task.description || 'Sin descripción')}</div>
+                    <div>
+                        <span class="task-status-badge status-${task.status}">
+                            ${getStatusLabel(task.status)}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="priority-indicator priority-${task.priority}"></span>
+                        ${getPriorityLabel(task.priority)}
+                    </div>
+                    <div class="task-assignee-col">
+                        ${task.assignee_name ? `
+                            <div class="assignee-avatar">${task.assignee_name.charAt(0).toUpperCase()}</div>
+                            <span>${escapeHtml(task.assignee_name)}</span>
+                        ` : '<span style="color: #9ca3af;">Sin asignar</span>'}
+                    </div>
+                    <div class="task-date-col">
+                        ${task.due_date ? formatDate(task.due_date) : '-'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setupFilters() {
+            const statusFilter = document.getElementById('filterStatus');
+            const priorityFilter = document.getElementById('filterPriority');
+            const searchInput = document.getElementById('searchTasks');
+            
+            statusFilter.addEventListener('change', applyFilters);
+            priorityFilter.addEventListener('change', applyFilters);
+            searchInput.addEventListener('input', applyFilters);
+        }
+
+        function applyFilters() {
+            const status = document.getElementById('filterStatus').value;
+            const priority = document.getElementById('filterPriority').value;
+            const search = document.getElementById('searchTasks').value.toLowerCase();
+            
+            let filtered = allTasks;
+            
+            if (status) {
+                filtered = filtered.filter(t => t.status === status);
+            }
+            
+            if (priority) {
+                filtered = filtered.filter(t => t.priority === priority);
+            }
+            
+            if (search) {
+                filtered = filtered.filter(t => 
+                    t.title.toLowerCase().includes(search) ||
+                    (t.description && t.description.toLowerCase().includes(search))
+                );
+            }
+            
+            renderTasks(filtered);
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'todo': '📋 Por Hacer',
+                'in_progress': '🔄 En Progreso',
+                'review': '👀 En Revisión',
+                'done': '✅ Completado'
+            };
+            return labels[status] || status;
+        }
+
+        function getPriorityLabel(priority) {
+            const labels = {
+                'urgent': 'Urgente',
+                'high': 'Alta',
+                'normal': 'Normal',
+                'low': 'Baja'
+            };
+            return labels[priority] || priority;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { day: 'numeric', month: 'short' };
+            return date.toLocaleDateString('es-ES', options);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function viewTask(id) {
+            console.log('Ver tarea:', id);
+            // TODO: Abrir modal de detalle
+        }
+
+        function toggleTaskStatus(id) {
+            console.log('Toggle status:', id);
+            // TODO: Actualizar estado
+        }
+
+        function showError(message) {
+            const container = document.getElementById('tasksList');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">❌</div>
+                    <div>${message}</div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
