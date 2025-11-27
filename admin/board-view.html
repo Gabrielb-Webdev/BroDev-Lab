@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Board View - BroDev Lab</title>
-    <link rel="stylesheet" href="board-styles.css?v=1.1">
+    <link rel="stylesheet" href="board-styles.css?v=1.2">
     <base href="/admin/">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -61,29 +61,40 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
         }
+        
+        /* Tab disabled */
+        .view-tab.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .view-tab.disabled:hover {
+            background: transparent;
+            color: #6b7280;
+        }
     </style>
 </head>
 <body>
     <!-- Header con navegación de vistas -->
     <div class="view-header">
         <div class="view-tabs">
-            <a href="index.php" class="view-tab">
+            <a href="/admin/index.php" class="view-tab">
                 <span class="icon">📊</span>
                 <span>Dashboard</span>
             </a>
-            <a href="index.php?view=list" class="view-tab">
+            <a href="/admin/index.php?view=list" class="view-tab">
                 <span class="icon">📝</span>
                 <span>Lista</span>
             </a>
-            <a href="board-view.html" class="view-tab active">
+            <a href="/admin/board-view.html" class="view-tab active">
                 <span class="icon">📋</span>
                 <span>Board</span>
             </a>
-            <a href="#" class="view-tab" title="Próximamente">
+            <a href="#" class="view-tab disabled" title="Próximamente" onclick="return false;">
                 <span class="icon">📅</span>
                 <span>Calendario</span>
             </a>
-            <a href="#" class="view-tab" title="Próximamente">
+            <a href="#" class="view-tab disabled" title="Próximamente" onclick="return false;">
                 <span class="icon">📈</span>
                 <span>Gantt</span>
             </a>
@@ -194,6 +205,6 @@
         // Configurar URL base para Hostinger
         window.SITE_URL = 'https://grey-squirrel-133805.hostingersite.com';
     </script>
-    <script src="board-view.js?v=1.1"></script>
+    <script src="board-view.js?v=1.2"></script>
 </body>
 </html>
