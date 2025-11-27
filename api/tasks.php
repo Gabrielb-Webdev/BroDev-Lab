@@ -1,38 +1,48 @@
 <?php
 /**
- * API para gestión de tareas v0.4
+ * API para gestión de tareas v0.6
  * Endpoint: /api/tasks.php
- * Corregido: nombres de columnas de tabla projects
+ * - Headers establecidos primero
+ * - GET sin auth (solo lectura)
+ * - POST/PUT/DELETE con auth
  */
 
-// Habilitar errores para debug en desarrollo
+// Habilitar errores para debug
 error_reporting(E_ALL);
-ini_set('display_errors', 0); // No mostrar en producción
+ini_set('display_errors', 0);
 ini_set('log_errors', 1);
+
+// Establecer headers PRIMERO
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+// Manejar preflight
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
 try {
     require_once '../config/config.php';
-    require_once '../config/auth-middleware.php';
-    
-    setCorsHeaders();
     
     $db = getDBConnection();
     $method = $_SERVER['REQUEST_METHOD'];
     $action = $_GET['action'] ?? '';
     
 } catch (Exception $e) {
-    header('Content-Type: application/json');
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error' => 'Error de inicialización: ' . $e->getMessage(),
-        'trace' => $e->getTraceAsString()
+        'error' => 'Error de inicialización: ' . $e->getMessage()
     ]);
     exit;
 }
 
 switch ($method) {
     case 'GET':
+        // GET no requiere auth (solo lectura)
         if ($action === 'by-status') {
             getAllTasksByStatus($db);
         } elseif ($action === 'by-project') {
@@ -45,22 +55,27 @@ switch ($method) {
         break;
         
     case 'POST':
+        // POST, PUT, DELETE requieren auth
+        require_once '../config/auth-middleware.php';
         requireAuth();
         createTask($db);
         break;
         
     case 'PUT':
+        require_once '../config/auth-middleware.php';
         requireAuth();
         updateTask($db);
         break;
         
     case 'DELETE':
+        require_once '../config/auth-middleware.php';
         requireAuth();
         deleteTask($db);
         break;
         
     default:
-        sendJsonResponse(['error' => 'Método no permitido'], 405);
+        http_response_code(405);
+        echo json_encode(['success' => false, 'error' => 'Método no permitido']);
 }
 
 function getAllTasks($db) {
@@ -89,14 +104,20 @@ function getAllTasks($db) {
         $stmt->execute();
         $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        sendJsonResponse([
+        http_response_code(200);
+        echo json_encode([
             'success' => true,
-            'data' => $tasks
+            'data' => $tasks,
+            'total' => count($tasks)
         ]);
         
     } catch (PDOException $e) {
         error_log("Error fetching tasks: " . $e->getMessage());
-        sendJsonResponse(['error' => 'Error al obtener tareas'], 500);
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'error' => 'Error al obtener tareas: ' . $e->getMessage()
+        ]);
     }
 }
 
@@ -135,7 +156,8 @@ function getAllTasksByStatus($db) {
             $grouped[$status][] = $task;
         }
         
-        sendJsonResponse([
+        http_response_code(200);
+        echo json_encode([
             'success' => true,
             'data' => $grouped,
             'total' => count($tasks)
@@ -143,23 +165,25 @@ function getAllTasksByStatus($db) {
         
     } catch (PDOException $e) {
         error_log("Error fetching tasks by status: " . $e->getMessage());
-        sendJsonResponse([
+        http_response_code(500);
+        echo json_encode([
             'success' => false,
-            'error' => 'Error al obtener tareas: ' . $e->getMessage(),
-            'query_error' => $e->errorInfo
-        ], 500);
+            'error' => 'Error al obtener tareas: ' . $e->getMessage()
+        ]);
     } catch (Exception $e) {
         error_log("Error general: " . $e->getMessage());
-        sendJsonResponse([
+        http_response_code(500);
+        echo json_encode([
             'success' => false,
             'error' => 'Error general: ' . $e->getMessage()
-        ], 500);
+        ]);
     }
 }
 
 function getTasksByProject($db, $projectId) {
     if (!$projectId) {
-        sendJsonResponse(['error' => 'Project ID requerido'], 400);
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Project ID requerido']);
         return;
     }
     
@@ -400,9 +424,9 @@ function logSyncEvent($db, $entityType, $action, $entityId, $changes) {
     }
 }
 
+// Función helper simplificada (headers ya establecidos arriba)
 function sendJsonResponse($data, $statusCode = 200) {
     http_response_code($statusCode);
-    header('Content-Type: application/json');
     echo json_encode($data);
     exit;
 }
