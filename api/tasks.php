@@ -1,7 +1,8 @@
 <?php
 /**
- * API para gestión de tareas
+ * API para gestión de tareas v0.3
  * Endpoint: /api/tasks.php
+ * Corregido: nombres de columnas de tabla projects
  */
 
 require_once '../config/config.php';
@@ -50,9 +51,10 @@ function getAllTasks($db) {
         $query = "
             SELECT 
                 t.*,
-                p.name as project_name,
-                p.color as project_color,
-                u.username as assignee_name
+                p.project_name,
+                p.status as project_status,
+                u.username as assignee_name,
+                u.full_name as assignee_full_name
             FROM tasks t
             LEFT JOIN projects p ON t.project_id = p.id
             LEFT JOIN admins u ON t.assignee_id = u.id
@@ -86,9 +88,10 @@ function getAllTasksByStatus($db) {
         $query = "
             SELECT 
                 t.*,
-                p.name as project_name,
-                p.color as project_color,
-                u.username as assignee_name
+                p.project_name,
+                p.status as project_status,
+                u.username as assignee_name,
+                u.full_name as assignee_full_name
             FROM tasks t
             LEFT JOIN projects p ON t.project_id = p.id
             LEFT JOIN admins u ON t.assignee_id = u.id
@@ -137,9 +140,10 @@ function getTasksByProject($db, $projectId) {
         $query = "
             SELECT 
                 t.*,
-                p.name as project_name,
-                p.color as project_color,
-                u.username as assignee_name
+                p.project_name,
+                p.status as project_status,
+                u.username as assignee_name,
+                u.full_name as assignee_full_name
             FROM tasks t
             LEFT JOIN projects p ON t.project_id = p.id
             LEFT JOIN admins u ON t.assignee_id = u.id
@@ -168,8 +172,10 @@ function getTaskById($db, $id) {
         $query = "
             SELECT 
                 t.*,
-                p.name as project_name,
-                u.username as assignee_name
+                p.project_name,
+                p.status as project_status,
+                u.username as assignee_name,
+                u.full_name as assignee_full_name
             FROM tasks t
             LEFT JOIN projects p ON t.project_id = p.id
             LEFT JOIN admins u ON t.assignee_id = u.id
