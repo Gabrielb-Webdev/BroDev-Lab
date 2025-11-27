@@ -1,7 +1,7 @@
 /**
- * Board View - Kanban Style (like ClickUp) v0.6
+ * Board View - Kanban Style (like ClickUp) v1.0
  * Con drag & drop, prioridades, y tiempo real
- * API corregido - GET sin auth, POST/PUT/DELETE con auth
+ * API limpio v1.0 - Sin middleware, funcional
  */
 
 // Detectar si estamos en producción o desarrollo
