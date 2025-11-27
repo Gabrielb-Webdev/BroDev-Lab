@@ -264,36 +264,35 @@
             }
 
             try {
-                addLog('📦 Leyendo archivos SQL...', 'info');
+                addLog('📦 Fase 1: Leyendo estructura de tablas...', 'info');
                 progressFill.style.width = '10%';
 
-                // Cargar archivo de estructura
+                // FASE 1: Cargar y ejecutar ESTRUCTURA
                 const response1 = await fetch('/database-tasks-simple.sql');
+                if (!response1.ok) {
+                    throw new Error('No se pudo cargar database-tasks-simple.sql');
+                }
                 const sqlStructure = await response1.text();
-                
-                // Cargar archivo de datos
-                const response2 = await fetch('/database-tasks-data.sql');
-                const sqlData = await response2.text();
 
-                addLog('✅ Archivos SQL cargados', 'success');
+                addLog('✅ Estructura cargada', 'success');
                 progressFill.style.width = '20%';
 
-                // Dividir en statements individuales (mejor parsing)
-                const statements = [
-                    ...sqlStructure.split(/;\s*$/m).map(s => s.trim()).filter(s => s && !s.startsWith('--')),
-                    ...sqlData.split(/;\s*$/m).map(s => s.trim()).filter(s => s && !s.startsWith('--'))
-                ];
+                // Dividir statements de estructura
+                const structureStatements = sqlStructure
+                    .split(/;\s*$/m)
+                    .map(s => s.trim())
+                    .filter(s => s && !s.startsWith('--') && s.length > 10);
 
-                addLog(`📊 ${statements.length} sentencias SQL encontradas`, 'info');
-                progressFill.style.width = '30%';
+                addLog(`📊 ${structureStatements.length} tablas a crear`, 'info');
+                progressFill.style.width = '25%';
 
                 let successCount = 0;
                 let errorCount = 0;
 
-                for (let i = 0; i < statements.length; i++) {
-                    const stmt = statements[i];
-                    if (!stmt) continue;
-
+                // Ejecutar estructura PRIMERO
+                for (let i = 0; i < structureStatements.length; i++) {
+                    const stmt = structureStatements[i];
+                    
                     try {
                         const result = await fetch('/install-tasks.php', {
                             method: 'POST',
@@ -304,24 +303,69 @@
                         const data = await result.json();
 
                         if (data.success) {
+                            const tableName = stmt.match(/CREATE TABLE.*?`?(\w+)`?/i)?.[1] || 'tabla';
+                            addLog(`✅ Tabla creada: ${tableName}`, 'success');
                             successCount++;
-                            const preview = stmt.substring(0, 60).replace(/\s+/g, ' ');
-                            addLog(`✅ ${preview}...`, 'success');
                         } else {
-                            if (!data.error.includes('already exists')) {
-                                errorCount++;
-                                addLog(`❌ Error: ${data.error}`, 'error');
-                            } else {
-                                addLog(`⚠️ ${data.error}`, 'warning');
-                            }
+                            addLog(`❌ Error: ${data.error}`, 'error');
+                            errorCount++;
                         }
-                    } catch (err) {
-                        errorCount++;
-                        addLog(`❌ Error ejecutando: ${err.message}`, 'error');
-                    }
 
-                    const progress = 30 + ((i + 1) / statements.length) * 60;
-                    progressFill.style.width = `${progress}%`;
+                        progressFill.style.width = `${25 + (i / structureStatements.length) * 35}%`;
+                    } catch (error) {
+                        addLog(`❌ Error de conexión: ${error.message}`, 'error');
+                        errorCount++;
+                    }
+                }
+
+                // FASE 2: Cargar y ejecutar DATOS
+                addLog('📦 Fase 2: Insertando datos de ejemplo...', 'info');
+                progressFill.style.width = '60%';
+
+                const response2 = await fetch('/database-tasks-data.sql');
+                if (!response2.ok) {
+                    addLog('⚠️ Archivo de datos no encontrado (opcional)', 'warning');
+                } else {
+                    const sqlData = await response2.text();
+                    
+                    const dataStatements = sqlData
+                        .split(/;\s*$/m)
+                        .map(s => s.trim())
+                        .filter(s => s && !s.startsWith('--') && s.length > 10);
+
+                    addLog(`📊 ${dataStatements.length} registros a insertar`, 'info');
+
+                    for (let i = 0; i < dataStatements.length; i++) {
+                        const stmt = dataStatements[i];
+                        
+                        try {
+                            const result = await fetch('/install-tasks.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ sql: stmt })
+                            });
+
+                            const data = await result.json();
+
+                            if (data.success) {
+                                const taskTitle = stmt.match(/'([^']+)'/)?.[1] || 'tarea';
+                                addLog(`✅ Insertada: ${taskTitle}`, 'success');
+                                successCount++;
+                            } else {
+                                if (data.error.includes('Duplicate') || data.error.includes('already exists')) {
+                                    addLog(`⚠️ Ya existe, omitido`, 'warning');
+                                } else {
+                                    addLog(`❌ Error: ${data.error}`, 'error');
+                                    errorCount++;
+                                }
+                            }
+
+                            progressFill.style.width = `${60 + (i / dataStatements.length) * 30}%`;
+                        } catch (error) {
+                            addLog(`❌ Error: ${error.message}`, 'error');
+                            errorCount++;
+                        }
+                    }
                 }
 
                 progressFill.style.width = '100%';
@@ -341,7 +385,7 @@
                     addLog('   • task_tags - Etiquetas', 'success');
                     addLog('', 'success');
                     addLog('🚀 Próximo paso:', 'info');
-                    addLog('   Abre: http://localhost/admin/board-view.html', 'info');
+                    addLog('   Abre: https://grey-squirrel-133805.hostingersite.com/admin/board-view.html', 'info');
 
                     status.textContent = '✅ Sistema instalado correctamente';
                     status.className = 'status success show';
