@@ -264,21 +264,25 @@
             }
 
             try {
-                addLog('📦 Leyendo archivo SQL...', 'info');
+                addLog('📦 Leyendo archivos SQL...', 'info');
                 progressFill.style.width = '10%';
 
-                // Usar ruta absoluta para Hostinger
-                const response = await fetch('/database-tasks.sql');
-                const sql = await response.text();
+                // Cargar archivo de estructura
+                const response1 = await fetch('/database-tasks-simple.sql');
+                const sqlStructure = await response1.text();
+                
+                // Cargar archivo de datos
+                const response2 = await fetch('/database-tasks-data.sql');
+                const sqlData = await response2.text();
 
-                addLog('✅ Archivo SQL cargado', 'success');
+                addLog('✅ Archivos SQL cargados', 'success');
                 progressFill.style.width = '20%';
 
-                // Dividir en statements individuales
-                const statements = sql
-                    .split(';')
-                    .map(s => s.trim())
-                    .filter(s => s && !s.startsWith('--') && s.toLowerCase() !== 'delimiter');
+                // Dividir en statements individuales (mejor parsing)
+                const statements = [
+                    ...sqlStructure.split(/;\s*$/m).map(s => s.trim()).filter(s => s && !s.startsWith('--')),
+                    ...sqlData.split(/;\s*$/m).map(s => s.trim()).filter(s => s && !s.startsWith('--'))
+                ];
 
                 addLog(`📊 ${statements.length} sentencias SQL encontradas`, 'info');
                 progressFill.style.width = '30%';
