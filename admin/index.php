@@ -562,9 +562,10 @@
         </div>
     </div>
 
-    <!-- WebSocket Real-Time System -->
-    <script src="websocket-client.js?v=1.0"></script>
-    <script src="realtime-websocket.js?v=1.0"></script>
+    <!-- WebSocket Real-Time System (DESHABILITADO TEMPORALMENTE) -->
+    <!-- <script src="websocket-client.js?v=1.0"></script> -->
+    <!-- <script src="realtime-websocket.js?v=1.0"></script> -->
+    <!-- TODO: Activar cuando esté compilado y desplegado -->
     
     <!-- Dynamic Table System -->
     <script src="dynamic-system.js?v=1.0"></script>

@@ -62,16 +62,21 @@ function handleGet($pdo, $action) {
 }
 
 function getFieldTypes($pdo) {
-    $stmt = $pdo->query("SELECT * FROM field_types ORDER BY type_label");
-    $types = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    foreach ($types as &$type) {
-        if ($type['validation_rules']) {
-            $type['validation_rules'] = json_decode($type['validation_rules'], true);
+    try {
+        $stmt = $pdo->query("SELECT * FROM field_types ORDER BY type_label");
+        $types = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($types as &$type) {
+            if ($type['validation_rules']) {
+                $type['validation_rules'] = json_decode($type['validation_rules'], true);
+            }
         }
+        
+        echo json_encode(['success' => true, 'data' => $types]);
+    } catch (PDOException $e) {
+        // Tabla no existe todavía
+        echo json_encode(['success' => true, 'data' => [], 'warning' => 'Custom fields tables not installed yet']);
     }
-    
-    echo json_encode(['success' => true, 'data' => $types]);
 }
 
 function getCustomFields($pdo) {
@@ -81,29 +86,34 @@ function getCustomFields($pdo) {
         throw new Exception('entity_type es requerido');
     }
     
-    $stmt = $pdo->prepare("
-        SELECT 
-            cf.*,
-            ft.type_label,
-            ft.icon as type_icon
-        FROM custom_fields cf
-        LEFT JOIN field_types ft ON cf.field_type = ft.type_name
-        WHERE cf.entity_type = ? AND cf.is_visible = 1
-        ORDER BY cf.display_order
-    ");
-    $stmt->execute([$entityType]);
-    $fields = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    foreach ($fields as &$field) {
-        if ($field['field_options']) {
-            $field['field_options'] = json_decode($field['field_options'], true);
+    try {
+        $stmt = $pdo->prepare("
+            SELECT 
+                cf.*,
+                ft.type_label,
+                ft.icon as type_icon
+            FROM custom_fields cf
+            LEFT JOIN field_types ft ON cf.field_type = ft.type_name
+            WHERE cf.entity_type = ? AND cf.is_visible = 1
+            ORDER BY cf.display_order
+        ");
+        $stmt->execute([$entityType]);
+        $fields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($fields as &$field) {
+            if ($field['field_options']) {
+                $field['field_options'] = json_decode($field['field_options'], true);
+            }
+            if ($field['validation_rules']) {
+                $field['validation_rules'] = json_decode($field['validation_rules'], true);
+            }
         }
-        if ($field['validation_rules']) {
-            $field['validation_rules'] = json_decode($field['validation_rules'], true);
-        }
+        
+        echo json_encode(['success' => true, 'data' => $fields]);
+    } catch (PDOException $e) {
+        // Tabla no existe todavía
+        echo json_encode(['success' => true, 'data' => [], 'warning' => 'Custom fields tables not installed yet']);
     }
-    
-    echo json_encode(['success' => true, 'data' => $fields]);
 }
 
 function getCustomField($pdo) {
@@ -137,20 +147,19 @@ function getCustomField($pdo) {
         ");
         $stmt->execute([$fieldId]);
         $field['options'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
-    echo json_encode(['success' => true, 'data' => $field]);
-}
-
 function getFieldValues($pdo) {
     $entityType = $_GET['entity_type'] ?? null;
     $entityIds = $_GET['entity_ids'] ?? null;
-    
+
     if (!$entityType) {
         throw new Exception('entity_type es requerido');
     }
-    
-    // Obtener campos para esta entidad
+
+    try {
+        // Obtener campos para esta entidad
+        $stmt = $pdo->prepare("SELECT id, field_name FROM custom_fields WHERE entity_type = ? AND is_visible = 1");
+        $stmt->execute([$entityType]);
+        $fields = $stmt->fetchAll(PDO::FETCH_ASSOC);    // Obtener campos para esta entidad
     $stmt = $pdo->prepare("SELECT id, field_name FROM custom_fields WHERE entity_type = ? AND is_visible = 1");
     $stmt->execute([$entityType]);
     $fields = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -191,32 +200,39 @@ function getFieldValues($pdo) {
     }
     
     echo json_encode(['success' => true, 'data' => array_values($organized)]);
-}
-
+    echo json_encode(['success' => true, 'data' => array_values($organized)]);
+    } catch (PDOException $e) {
 function getCustomViews($pdo) {
     $entityType = $_GET['entity_type'] ?? null;
-    
+
     if (!$entityType) {
         throw new Exception('entity_type es requerido');
     }
-    
-    $stmt = $pdo->prepare("
-        SELECT * FROM custom_views 
-        WHERE entity_type = ? AND is_public = 1
-        ORDER BY is_default DESC, view_name
-    ");
-    $stmt->execute([$entityType]);
-    $views = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    foreach ($views as &$view) {
-        if ($view['visible_fields']) {
-            $view['visible_fields'] = json_decode($view['visible_fields'], true);
+
+    try {
+        $stmt = $pdo->prepare("
+            SELECT * FROM custom_views
+            WHERE entity_type = ? AND is_public = 1
+            ORDER BY is_default DESC, view_name
+        ");
+        $stmt->execute([$entityType]);
+        $views = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($views as &$view) {
+            if ($view['visible_fields']) {
+                $view['visible_fields'] = json_decode($view['visible_fields'], true);
+            }
+            if ($view['filters']) {
+                $view['filters'] = json_decode($view['filters'], true);
+            }
         }
-        if ($view['filters']) {
-            $view['filters'] = json_decode($view['filters'], true);
-        }
+
+        echo json_encode(['success' => true, 'data' => $views]);
+    } catch (PDOException $e) {
+        // Tabla no existe todavía
+        echo json_encode(['success' => true, 'data' => [], 'warning' => 'Custom views tables not installed yet']);
     }
-    
+}    
     echo json_encode(['success' => true, 'data' => $views]);
 }
 

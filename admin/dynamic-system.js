@@ -506,11 +506,12 @@ async function initDynamicSystem() {
     await loadProjectsData();
     
     // Iniciar sincronización en tiempo real (WebSocket + Polling Fallback)
-    realtimeSync = new RealtimeSyncWebSocket();
-    realtimeSync.onUpdate((updates) => {
-        handleRealtimeUpdates(updates);
-    });
-    realtimeSync.start('project');
+    // DESHABILITADO TEMPORALMENTE - WebSocket no disponible
+    // realtimeSync = new RealtimeSyncWebSocket();
+    // realtimeSync.onUpdate((updates) => {
+    //     handleRealtimeUpdates(updates);
+    // });
+    // realtimeSync.start('project');
 }
 
 async function loadProjectsData() {
@@ -553,7 +554,7 @@ function handleRealtimeUpdates(updates) {
 
 // Exportar para uso global
 window.RealtimeSync = RealtimeSync; // Mantener por compatibilidad
-window.RealtimeSyncWebSocket = RealtimeSyncWebSocket; // Nueva clase híbrida
+// window.RealtimeSyncWebSocket = RealtimeSyncWebSocket; // DESHABILITADO - No disponible
 window.CustomFieldsManager = CustomFieldsManager;
 window.DynamicTableRenderer = DynamicTableRenderer;
 window.initDynamicSystem = initDynamicSystem;
