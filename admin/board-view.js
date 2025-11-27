@@ -1,6 +1,7 @@
 /**
- * Board View - Kanban Style (like ClickUp) v0.4
+ * Board View - Kanban Style (like ClickUp) v0.5
  * Con drag & drop, prioridades, y tiempo real
+ * Usando API simplificado sin auth
  */
 
 // Detectar si estamos en producción o desarrollo
@@ -61,10 +62,12 @@ async function loadInitialData() {
 // Cargar tareas desde API real
 async function loadTasks() {
     try {
-        const response = await fetch(`${API_BASE}/tasks.php?action=by-status`);
+        // Usar API simplificado (sin auth) temporalmente
+        const response = await fetch(`${API_BASE}/tasks-simple.php?action=by-status`);
         
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            const text = await response.text();
+            throw new Error(`HTTP ${response.status}: ${text.substring(0, 100)}`);
         }
         
         const result = await response.json();

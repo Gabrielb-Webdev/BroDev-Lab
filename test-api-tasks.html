@@ -87,9 +87,15 @@
         </div>
 
         <div class="test-section">
-            <div class="test-title">Test 4: Verificar tablas en BD</div>
-            <button onclick="testTables()">Verificar Tablas</button>
+            <div class="test-title">Test 4: API Simplificado (sin auth)</div>
+            <button onclick="testSimple()">Test Simple API</button>
             <div id="test4" class="result info" style="display:none;"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Test 5: API Simplificado - Por Estado</div>
+            <button onclick="testSimpleByStatus()">Test Simple By Status</button>
+            <div id="test5" class="result info" style="display:none;"></div>
         </div>
     </div>
 
@@ -174,18 +180,62 @@
             }
         }
 
-        async function testTables() {
+        async function testSimple() {
             const result = document.getElementById('test4');
             result.style.display = 'block';
-            result.textContent = '⏳ Verificando tablas...';
+            result.textContent = '⏳ Probando API simplificado...';
             result.className = 'result info';
 
             try {
-                const response = await fetch(`${API_BASE}/test-tasks.php`);
+                const response = await fetch(`${API_BASE}/tasks-simple.php`);
+                
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${text.substring(0, 200)}`);
+                }
+                
                 const data = await response.json();
                 
-                result.className = 'result success';
-                result.textContent = `✅ Verificación de tablas\n\nBase de datos: ${data.database}\nTabla 'tasks' encontrada: ${data.total_tasks} registros\n\n✅ Todo OK`;
+                if (data.success) {
+                    result.className = 'result success';
+                    result.textContent = `✅ ÉXITO\n\nTotal: ${data.total}\nPrimera tarea:\n\n${JSON.stringify(data.data[0], null, 2)}`;
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `❌ ERROR\n\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ ERROR\n\n${error.message}`;
+            }
+        }
+
+        async function testSimpleByStatus() {
+            const result = document.getElementById('test5');
+            result.style.display = 'block';
+            result.textContent = '⏳ Probando API simplificado por estado...';
+            result.className = 'result info';
+
+            try {
+                const response = await fetch(`${API_BASE}/tasks-simple.php?action=by-status`);
+                
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${text.substring(0, 200)}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const summary = Object.entries(data.data).map(([status, tasks]) => 
+                        `${status}: ${tasks.length} tareas`
+                    ).join('\n');
+                    
+                    result.className = 'result success';
+                    result.textContent = `✅ ÉXITO\n\nTotal: ${data.total}\n\n${summary}\n\n✅ Este endpoint funciona!\nAhora puedes usarlo en board-view.js`;
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `❌ ERROR\n\n${JSON.stringify(data, null, 2)}`;
+                }
             } catch (error) {
                 result.className = 'result error';
                 result.textContent = `❌ ERROR\n\n${error.message}`;
