@@ -1,5 +1,6 @@
 /* ============================================
-   BOARD VIEW STYLES - ClickUp Style v0.2
+   BOARD VIEW STYLES - ClickUp Style v1.0
+   Optimizado y funcional
    ============================================ */
 
 :root {
@@ -13,6 +14,18 @@
     --priority-high: #f59e0b;
     --priority-normal: #3b82f6;
     --priority-low: #10b981;
+}
+
+/* Reset general */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--board-bg);
 }
 
 /* Header de navegación de vistas */
@@ -108,16 +121,20 @@
 /* Board Container */
 .board-container {
     background: var(--board-bg);
-    padding: 2rem;
-    min-height: calc(100vh - 80px);
+    width: 100%;
+    height: calc(100vh - 80px);
     overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0;
 }
 
 .board-columns {
     display: flex;
     gap: 1.5rem;
-    min-width: min-content;
-    padding-bottom: 2rem;
+    padding: 2rem;
+    min-width: fit-content;
+    height: 100%;
+    align-items: flex-start;
 }
 
 /* Columna del Board */

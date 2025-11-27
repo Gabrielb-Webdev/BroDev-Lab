@@ -1,7 +1,8 @@
 /**
- * Board View - Kanban Style (like ClickUp) v1.0
+ * Board View - Kanban Style (like ClickUp) v1.1
  * Con drag & drop, prioridades, y tiempo real
  * API limpio v1.0 - Sin middleware, funcional
+ * CSS optimizado para visualización correcta
  */
 
 // Detectar si estamos en producción o desarrollo

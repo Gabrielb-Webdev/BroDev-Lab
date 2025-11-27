@@ -4,12 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Board View - BroDev Lab</title>
-    <link rel="stylesheet" href="admin-styles.css?v=2.5">
-    <link rel="stylesheet" href="board-styles.css?v=0.3">
+    <link rel="stylesheet" href="board-styles.css?v=1.1">
     <base href="/admin/">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Reset y estilos base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+            overflow-x: hidden;
+        }
+        
+        /* Fix para asegurar que el board se vea correctamente */
+        .board-container {
+            width: 100%;
+            height: calc(100vh - 80px);
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        
+        .board-columns {
+            display: flex !important;
+            gap: 1.5rem !important;
+            padding: 2rem;
+            min-width: fit-content;
+            flex-wrap: nowrap !important;
+        }
+        
+        .board-column {
+            flex: 0 0 320px !important;
+            width: 320px !important;
+        }
+        
+        /* Botones mejorados */
+        .btn-primary {
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+        }
+    </style>
 </head>
-<body class="admin-body">
+<body>
     <!-- Header con navegación de vistas -->
     <div class="view-header">
         <div class="view-tabs">
@@ -140,6 +194,6 @@
         // Configurar URL base para Hostinger
         window.SITE_URL = 'https://grey-squirrel-133805.hostingersite.com';
     </script>
-    <script src="board-view.js?v=1.0"></script>
+    <script src="board-view.js?v=1.1"></script>
 </body>
 </html>
