@@ -1,18 +1,35 @@
 <?php
 /**
- * API para gestión de tareas v0.3
+ * API para gestión de tareas v0.4
  * Endpoint: /api/tasks.php
  * Corregido: nombres de columnas de tabla projects
  */
 
-require_once '../config/config.php';
-require_once '../config/auth-middleware.php';
+// Habilitar errores para debug en desarrollo
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // No mostrar en producción
+ini_set('log_errors', 1);
 
-setCorsHeaders();
-
-$db = getDBConnection();
-$method = $_SERVER['REQUEST_METHOD'];
-$action = $_GET['action'] ?? '';
+try {
+    require_once '../config/config.php';
+    require_once '../config/auth-middleware.php';
+    
+    setCorsHeaders();
+    
+    $db = getDBConnection();
+    $method = $_SERVER['REQUEST_METHOD'];
+    $action = $_GET['action'] ?? '';
+    
+} catch (Exception $e) {
+    header('Content-Type: application/json');
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Error de inicialización: ' . $e->getMessage(),
+        'trace' => $e->getTraceAsString()
+    ]);
+    exit;
+}
 
 switch ($method) {
     case 'GET':
@@ -126,7 +143,17 @@ function getAllTasksByStatus($db) {
         
     } catch (PDOException $e) {
         error_log("Error fetching tasks by status: " . $e->getMessage());
-        sendJsonResponse(['error' => 'Error al obtener tareas'], 500);
+        sendJsonResponse([
+            'success' => false,
+            'error' => 'Error al obtener tareas: ' . $e->getMessage(),
+            'query_error' => $e->errorInfo
+        ], 500);
+    } catch (Exception $e) {
+        error_log("Error general: " . $e->getMessage());
+        sendJsonResponse([
+            'success' => false,
+            'error' => 'Error general: ' . $e->getMessage()
+        ], 500);
     }
 }
 

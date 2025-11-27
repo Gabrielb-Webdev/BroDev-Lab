@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico API - BroDev Lab</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #7c3aed;
+        }
+        .test-section {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #7c3aed;
+        }
+        .test-title {
+            font-weight: 600;
+            color: #7c3aed;
+            margin-bottom: 0.5rem;
+        }
+        .result {
+            margin-top: 0.5rem;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .success { background: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .error { background: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+        .info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
+        button {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        button:hover { background: #6d28d9; }
+        .loading { opacity: 0.6; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnóstico API de Tareas</h1>
+        
+        <div class="test-section">
+            <div class="test-title">Test 1: Conexión básica</div>
+            <button onclick="testBasic()">Ejecutar Test Básico</button>
+            <div id="test1" class="result info" style="display:none;"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Test 2: Listar todas las tareas</div>
+            <button onclick="testAllTasks()">Listar Tareas</button>
+            <div id="test2" class="result info" style="display:none;"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Test 3: Tareas agrupadas por estado</div>
+            <button onclick="testByStatus()">Tareas por Estado</button>
+            <div id="test3" class="result info" style="display:none;"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Test 4: Verificar tablas en BD</div>
+            <button onclick="testTables()">Verificar Tablas</button>
+            <div id="test4" class="result info" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        async function testBasic() {
+            const result = document.getElementById('test1');
+            result.style.display = 'block';
+            result.textContent = '⏳ Probando conexión...';
+            result.className = 'result info';
+
+            try {
+                const response = await fetch(`${API_BASE}/test-tasks.php`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.className = 'result success';
+                    result.textContent = `✅ ÉXITO\n\nConexión: OK\nBase de datos: ${data.database}\nTotal de tareas: ${data.total_tasks}`;
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `❌ ERROR\n\n${data.error}\nArchivo: ${data.file}\nLínea: ${data.line}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ ERROR DE CONEXIÓN\n\n${error.message}`;
+            }
+        }
+
+        async function testAllTasks() {
+            const result = document.getElementById('test2');
+            result.style.display = 'block';
+            result.textContent = '⏳ Cargando tareas...';
+            result.className = 'result info';
+
+            try {
+                const response = await fetch(`${API_BASE}/tasks.php`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.className = 'result success';
+                    result.textContent = `✅ ÉXITO\n\nTotal tareas: ${data.data.length}\n\n${JSON.stringify(data.data.slice(0, 2), null, 2)}...`;
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `❌ ERROR\n\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ ERROR\n\n${error.message}`;
+            }
+        }
+
+        async function testByStatus() {
+            const result = document.getElementById('test3');
+            result.style.display = 'block';
+            result.textContent = '⏳ Cargando tareas por estado...';
+            result.className = 'result info';
+
+            try {
+                const response = await fetch(`${API_BASE}/tasks.php?action=by-status`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const summary = Object.entries(data.data).map(([status, tasks]) => 
+                        `${status}: ${tasks.length} tareas`
+                    ).join('\n');
+                    
+                    result.className = 'result success';
+                    result.textContent = `✅ ÉXITO\n\nTotal: ${data.total}\n\n${summary}\n\nPrimera tarea:\n${JSON.stringify(data.data.todo?.[0] || data.data.in_progress?.[0], null, 2)}`;
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `❌ ERROR\n\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ ERROR\n\n${error.message}`;
+            }
+        }
+
+        async function testTables() {
+            const result = document.getElementById('test4');
+            result.style.display = 'block';
+            result.textContent = '⏳ Verificando tablas...';
+            result.className = 'result info';
+
+            try {
+                const response = await fetch(`${API_BASE}/test-tasks.php`);
+                const data = await response.json();
+                
+                result.className = 'result success';
+                result.textContent = `✅ Verificación de tablas\n\nBase de datos: ${data.database}\nTabla 'tasks' encontrada: ${data.total_tasks} registros\n\n✅ Todo OK`;
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ ERROR\n\n${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

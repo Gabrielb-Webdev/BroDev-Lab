@@ -1,5 +1,5 @@
 /**
- * Board View - Kanban Style (like ClickUp) v0.2
+ * Board View - Kanban Style (like ClickUp) v0.4
  * Con drag & drop, prioridades, y tiempo real
  */
 
@@ -62,6 +62,11 @@ async function loadInitialData() {
 async function loadTasks() {
     try {
         const response = await fetch(`${API_BASE}/tasks.php?action=by-status`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
         const result = await response.json();
         
         if (result.success) {
@@ -70,6 +75,7 @@ async function loadTasks() {
             Object.values(result.data).forEach(tasksInStatus => {
                 state.tasks.push(...tasksInStatus);
             });
+            console.log(`✅ ${state.tasks.length} tareas cargadas`);
         } else {
             console.error('Error loading tasks:', result.error);
             // Usar datos de ejemplo si falla la API
