@@ -200,7 +200,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📋 Instalador del Sistema de Tareas</h1>
+            <h1>📋 Instalador del Sistema de Tareas v0.2</h1>
             <p>BroDev Lab - Board/Kanban View</p>
         </div>
 
@@ -240,7 +240,7 @@
 
             <div class="warning">
                 <strong>⚠️ Antes de instalar:</strong>
-                Asegúrate de tener un backup de tu base de datos. Este script creará varias tablas nuevas y agregará datos de ejemplo.
+                Este script creará TODAS las tablas necesarias (clients, admins, projects, tasks, etc.) en el orden correcto. Si ya existen algunas tablas, serán omitidas automáticamente. Asegúrate de tener un backup de tu base de datos.
             </div>
 
             <button class="btn" id="installBtn" onclick="installDatabase()">

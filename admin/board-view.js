@@ -1,5 +1,5 @@
 /**
- * Board View - Kanban Style (like ClickUp)
+ * Board View - Kanban Style (like ClickUp) v0.2
  * Con drag & drop, prioridades, y tiempo real
  */
 

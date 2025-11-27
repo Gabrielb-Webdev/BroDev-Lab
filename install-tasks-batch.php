@@ -1,7 +1,7 @@
 <?php
 /**
- * Instalador Mejorado de Tasks
- * Ejecuta el SQL directamente sin dividir por cliente
+ * Instalador Mejorado de Tasks v0.2
+ * Ejecuta el SQL con todas las dependencias en orden correcto
  */
 
 require_once 'config/config.php';
@@ -16,10 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 try {
     $pdo = getDBConnection();
     
-    // Leer archivo SQL de estructura
-    $sqlFile = __DIR__ . '/database-tasks-simple.sql';
+    // Usar el archivo SQL completo que incluye todas las dependencias
+    $sqlFile = __DIR__ . '/database-complete-tasks.sql';
     if (!file_exists($sqlFile)) {
-        throw new Exception('Archivo database-tasks-simple.sql no encontrado');
+        throw new Exception('Archivo database-complete-tasks.sql no encontrado');
     }
     
     $sql = file_get_contents($sqlFile);
