@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://grey-squirrel-133805.hostingersite.com/sitemap.xml
+
+# Disallow admin or private directories (if any)
+# Disallow: /admin/
+# Disallow: /private/

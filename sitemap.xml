@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    
+    <!-- Home Page -->
+    <url>
+        <loc>https://grey-squirrel-133805.hostingersite.com/</loc>
+        <lastmod>2025-11-27</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+    
+    <!-- Services Page -->
+    <url>
+        <loc>https://grey-squirrel-133805.hostingersite.com/pages/services.html</loc>
+        <lastmod>2025-11-27</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <!-- Portfolio Page -->
+    <url>
+        <loc>https://grey-squirrel-133805.hostingersite.com/pages/portfolio.html</loc>
+        <lastmod>2025-11-27</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <!-- About Page -->
+    <url>
+        <loc>https://grey-squirrel-133805.hostingersite.com/pages/about.html</loc>
+        <lastmod>2025-11-27</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- Contact Page -->
+    <url>
+        <loc>https://grey-squirrel-133805.hostingersite.com/pages/contact.html</loc>
+        <lastmod>2025-11-27</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- Privacy Policy -->
+    <url>
+        <loc>https://grey-squirrel-133805.hostingersite.com/pages/privacy-policy.html</loc>
+        <lastmod>2025-11-27</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+    
+    <!-- Terms of Service -->
+    <url>
+        <loc>https://grey-squirrel-133805.hostingersite.com/pages/terms-of-service.html</loc>
+        <lastmod>2025-11-27</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+    
+</urlset>
