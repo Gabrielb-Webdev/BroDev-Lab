@@ -1,7 +1,7 @@
 <?php
 /**
- * Instalador Mejorado de Tasks v0.2
- * Ejecuta el SQL con todas las dependencias en orden correcto
+ * Instalador Mejorado de Tasks v0.3
+ * Ejecuta el SQL con todas las dependencias + datos de ejemplo
  */
 
 require_once 'config/config.php';
@@ -16,10 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 try {
     $pdo = getDBConnection();
     
-    // Usar el archivo SQL completo que incluye todas las dependencias
-    $sqlFile = __DIR__ . '/database-complete-tasks.sql';
+    // Usar el archivo SQL completo que incluye todas las dependencias Y datos de ejemplo
+    $sqlFile = __DIR__ . '/database-complete-tasks-with-data.sql';
     if (!file_exists($sqlFile)) {
-        throw new Exception('Archivo database-complete-tasks.sql no encontrado');
+        throw new Exception('Archivo database-complete-tasks-with-data.sql no encontrado');
     }
     
     $sql = file_get_contents($sqlFile);
@@ -40,88 +40,87 @@ try {
     $successCount = 0;
     $errorCount = 0;
     
-    // Ejecutar cada CREATE TABLE
+    // Ejecutar cada statement (CREATE TABLE e INSERT)
     foreach ($statements as $stmt) {
-        if (stripos($stmt, 'CREATE TABLE') === false) continue;
+        $stmtUpper = strtoupper($stmt);
+        
+        // Saltar statements vacíos
+        if (empty($stmt)) continue;
         
         try {
+            // Ejecutar el statement
             $pdo->exec($stmt);
             
-            // Extraer nombre de tabla
-            preg_match('/CREATE TABLE.*?`?(\w+)`?/i', $stmt, $matches);
-            $tableName = $matches[1] ?? 'tabla';
-            
-            $results[] = [
-                'success' => true,
-                'message' => "Tabla '$tableName' creada",
-                'table' => $tableName
-            ];
-            $successCount++;
+            // Determinar tipo y extraer info
+            if (stripos($stmt, 'CREATE TABLE') !== false) {
+                preg_match('/CREATE TABLE.*?`?(\w+)`?/i', $stmt, $matches);
+                $tableName = $matches[1] ?? 'tabla';
+                
+                $results[] = [
+                    'success' => true,
+                    'message' => "✅ Tabla '$tableName' creada",
+                    'type' => 'table'
+                ];
+                $successCount++;
+                
+            } elseif (stripos($stmt, 'INSERT') !== false) {
+                // Extraer info del INSERT
+                if (stripos($stmt, 'clients') !== false) {
+                    $item = 'Cliente demo';
+                } elseif (stripos($stmt, 'admins') !== false) {
+                    $item = 'Admin demo';
+                } elseif (stripos($stmt, 'projects') !== false) {
+                    $item = 'Proyecto demo';
+                } elseif (stripos($stmt, 'task_tags') !== false) {
+                    $item = 'Etiquetas (8)';
+                } elseif (stripos($stmt, 'task_tag_relations') !== false) {
+                    $item = 'Relaciones de tags';
+                } elseif (stripos($stmt, 'tasks') !== false) {
+                    $item = 'Tareas demo (8)';
+                } else {
+                    $item = 'Datos';
+                }
+                
+                $results[] = [
+                    'success' => true,
+                    'message' => "✅ $item insertado",
+                    'type' => 'data'
+                ];
+                $successCount++;
+            }
             
         } catch (PDOException $e) {
-            if (strpos($e->getMessage(), 'already exists') !== false) {
+            $errorMsg = $e->getMessage();
+            
+            // Manejar errores comunes sin fallar
+            if (strpos($errorMsg, 'already exists') !== false) {
                 preg_match('/CREATE TABLE.*?`?(\w+)`?/i', $stmt, $matches);
                 $tableName = $matches[1] ?? 'tabla';
                 $results[] = [
                     'success' => true,
                     'warning' => true,
-                    'message' => "Tabla '$tableName' ya existe",
-                    'table' => $tableName
+                    'message' => "⚠️ Tabla '$tableName' ya existe",
+                    'type' => 'warning'
                 ];
                 $successCount++;
-            } else {
-                $results[] = [
-                    'success' => false,
-                    'message' => $e->getMessage()
-                ];
-                $errorCount++;
-            }
-        }
-    }
-    
-    // Ahora insertar datos de ejemplo
-    $dataFile = __DIR__ . '/database-tasks-data.sql';
-    if (file_exists($dataFile)) {
-        $sqlData = file_get_contents($dataFile);
-        $sqlData = preg_replace('/--.*$/m', '', $sqlData);
-        
-        $dataStatements = array_filter(
-            array_map('trim', preg_split('/;\s*\n/s', $sqlData)),
-            function($stmt) {
-                return !empty($stmt) && strlen($stmt) > 10;
-            }
-        );
-        
-        foreach ($dataStatements as $stmt) {
-            if (stripos($stmt, 'INSERT') === false) continue;
-            
-            try {
-                $pdo->exec($stmt);
                 
-                // Extraer título de tarea
-                preg_match("/'([^']+)'/", $stmt, $matches);
-                $title = $matches[1] ?? 'registro';
-                
+            } elseif (strpos($errorMsg, 'Duplicate entry') !== false) {
                 $results[] = [
                     'success' => true,
-                    'message' => "Insertado: $title"
+                    'warning' => true,
+                    'message' => "⚠️ Datos ya existen, omitido",
+                    'type' => 'warning'
                 ];
                 $successCount++;
                 
-            } catch (PDOException $e) {
-                if (strpos($e->getMessage(), 'Duplicate') !== false) {
-                    $results[] = [
-                        'success' => true,
-                        'warning' => true,
-                        'message' => "Registro ya existe, omitido"
-                    ];
-                } else {
-                    $results[] = [
-                        'success' => false,
-                        'message' => $e->getMessage()
-                    ];
-                    $errorCount++;
-                }
+            } else {
+                // Error real
+                $results[] = [
+                    'success' => false,
+                    'message' => "❌ " . $errorMsg,
+                    'type' => 'error'
+                ];
+                $errorCount++;
             }
         }
     }

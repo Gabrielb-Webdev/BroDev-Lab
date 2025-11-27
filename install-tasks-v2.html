@@ -200,7 +200,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📋 Instalador del Sistema de Tareas v0.2</h1>
+            <h1>📋 Instalador del Sistema de Tareas v0.3</h1>
             <p>BroDev Lab - Board/Kanban View</p>
         </div>
 
@@ -337,11 +337,16 @@
                     addLog('🎉 ¡Instalación Completada con Éxito!', 'success');
                     addLog('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'success');
                     addLog('', 'success');
-                    addLog('✅ Tablas creadas: tasks, task_comments, task_activity, subtasks, task_tags', 'success');
-                    addLog('✅ 8 tareas de ejemplo insertadas', 'success');
+                    addLog('✅ Base de datos completa instalada:', 'success');
+                    addLog('   • Tablas: clients, admins, projects, tasks, subtasks, tags', 'success');
+                    addLog('   • 1 Cliente demo + 1 Admin + 1 Proyecto', 'success');
+                    addLog('   • 8 Tareas de ejemplo con etiquetas', 'success');
                     addLog('', 'info');
                     addLog('🚀 Próximo paso:', 'info');
                     addLog('   Abre: https://grey-squirrel-133805.hostingersite.com/admin/board-view.html', 'info');
+                    addLog('', 'info');
+                    addLog('🔐 Credenciales demo:', 'info');
+                    addLog('   Usuario: admin | Contraseña: admin123', 'info');
 
                     btn.textContent = '✅ Instalación Exitosa';
                     btn.style.background = '#10b981';
