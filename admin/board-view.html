@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Board View - BroDev Lab</title>
+    <link rel="stylesheet" href="admin-styles.css?v=2.5">
+    <link rel="stylesheet" href="board-styles.css?v=1.0">
+    <base href="/admin/">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="admin-body">
+    <!-- Header con navegación de vistas -->
+    <div class="view-header">
+        <div class="view-tabs">
+            <a href="index.php" class="view-tab">
+                <span class="icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="index.php?view=list" class="view-tab">
+                <span class="icon">📝</span>
+                <span>Lista</span>
+            </a>
+            <a href="board-view.html" class="view-tab active">
+                <span class="icon">📋</span>
+                <span>Board</span>
+            </a>
+            <a href="#" class="view-tab" title="Próximamente">
+                <span class="icon">📅</span>
+                <span>Calendario</span>
+            </a>
+            <a href="#" class="view-tab" title="Próximamente">
+                <span class="icon">📈</span>
+                <span>Gantt</span>
+            </a>
+        </div>
+        
+        <div class="view-actions">
+            <div class="search-box">
+                <input type="text" placeholder="Buscar tareas..." id="searchTasks">
+                <kbd>Ctrl+K</kbd>
+            </div>
+            <button class="btn-icon" id="filterBtn" title="Filtros">
+                <span>🔍</span>
+            </button>
+            <button class="btn-icon" id="groupBtn" title="Agrupar">
+                <span>📑</span>
+            </button>
+            <button class="btn-primary" id="newTaskBtn">
+                <span>➕</span> Nueva Tarea
+            </button>
+        </div>
+    </div>
+
+    <!-- Vista Board -->
+    <div class="board-container">
+        <div class="board-columns" id="boardColumns">
+            <!-- Las columnas se generarán dinámicamente -->
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar tarea -->
+    <div class="modal" id="taskModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Nueva Tarea</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="taskForm">
+                        <input type="hidden" id="taskId">
+                        
+                        <div class="form-group">
+                            <label>Nombre de la Tarea *</label>
+                            <input type="text" id="taskName" class="form-control" placeholder="Ej: Diseñar landing page" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Estado</label>
+                                <select id="taskStatus" class="form-control">
+                                    <option value="todo">📋 Por Hacer</option>
+                                    <option value="in_progress">🔄 En Progreso</option>
+                                    <option value="review">👀 En Revisión</option>
+                                    <option value="done">✅ Completado</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Prioridad</label>
+                                <select id="taskPriority" class="form-control">
+                                    <option value="low">🟢 Baja</option>
+                                    <option value="normal" selected>🟡 Normal</option>
+                                    <option value="high">🟠 Alta</option>
+                                    <option value="urgent">🔴 Urgente</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Asignado a</label>
+                                <select id="taskAssignee" class="form-control">
+                                    <option value="">Sin asignar</option>
+                                    <!-- Se llenarán dinámicamente -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Fecha Límite</label>
+                                <input type="date" id="taskDueDate" class="form-control">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <textarea id="taskDescription" class="form-control" rows="4" placeholder="Detalles de la tarea..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Proyecto</label>
+                            <select id="taskProject" class="form-control">
+                                <!-- Se llenarán dinámicamente -->
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary modal-close">Cancelar</button>
+                    <button type="button" class="btn-primary" id="saveTaskBtn">Guardar Tarea</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+        // Configurar URL base para Hostinger
+        window.SITE_URL = 'https://grey-squirrel-133805.hostingersite.com';
+    </script>
+    <script src="board-view.js?v=1.1"></script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Instalación - Hostinger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 4px solid #7c3aed;
+        }
+
+        .section h2 {
+            color: #7c3aed;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .step {
+            background: white;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 6px;
+            border-left: 3px solid #10b981;
+        }
+
+        .step h3 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .command {
+            background: #1f2937;
+            color: #10b981;
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+        }
+
+        .url {
+            background: #eff6ff;
+            color: #3b82f6;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            display: inline-block;
+            margin: 0.5rem 0;
+        }
+
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .warning strong {
+            color: #d97706;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .file-list {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+        }
+
+        .file-list li {
+            padding: 0.25rem 0;
+            color: #6b7280;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Instalación en Hostinger</h1>
+            <p>grey-squirrel-133805.hostingersite.com</p>
+        </div>
+
+        <div class="content">
+            <!-- Paso 1: Subir Archivos -->
+            <div class="section">
+                <h2>📁 Paso 1: Subir Archivos al Hosting</h2>
+                
+                <div class="step">
+                    <h3>1.1 Conectar por FTP/SFTP</h3>
+                    <p>Usa FileZilla o el File Manager de Hostinger:</p>
+                    <div class="command">
+                        Host: grey-squirrel-133805.hostingersite.com<br>
+                        Puerto: 21 (FTP) o 22 (SFTP)<br>
+                        Usuario: [tu usuario de Hostinger]<br>
+                        Contraseña: [tu contraseña]
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>1.2 Archivos a Subir</h3>
+                    <p>Sube estos archivos nuevos a tu carpeta <code>public_html</code>:</p>
+                    <div class="file-list">
+                        <ul>
+                            <li>📄 <strong>database-tasks.sql</strong> (raíz)</li>
+                            <li>📄 <strong>install-tasks.html</strong> (raíz)</li>
+                            <li>📄 <strong>install-tasks.php</strong> (raíz)</li>
+                            <li>📄 <strong>api/tasks.php</strong> (carpeta api/)</li>
+                            <li>📄 <strong>admin/board-view.html</strong> (carpeta admin/)</li>
+                            <li>📄 <strong>admin/board-view.js</strong> (carpeta admin/)</li>
+                            <li>📄 <strong>admin/board-styles.css</strong> (carpeta admin/)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="warning">
+                    <strong>⚠️ Importante:</strong>
+                    Asegúrate de que los permisos de los archivos PHP sean 644 y las carpetas 755.
+                </div>
+            </div>
+
+            <!-- Paso 2: Instalar Base de Datos -->
+            <div class="section">
+                <h2>🗄️ Paso 2: Instalar Base de Datos</h2>
+                
+                <div class="step">
+                    <h3>2.1 Acceder al Instalador</h3>
+                    <p>Abre en tu navegador:</p>
+                    <div class="url">
+                        https://grey-squirrel-133805.hostingersite.com/install-tasks.html
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>2.2 Ejecutar Instalación</h3>
+                    <p>1. Click en el botón "Instalar Sistema de Tareas"</p>
+                    <p>2. Espera 15-20 segundos</p>
+                    <p>3. Verás el log de instalación en tiempo real</p>
+                    <p>4. Cuando termine: "✅ Instalación Completada"</p>
+                </div>
+
+                <div class="success">
+                    <strong>✅ Esto creará:</strong>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>Tabla <code>tasks</code> con 8 tareas de ejemplo</li>
+                        <li>Tabla <code>task_comments</code> para comentarios</li>
+                        <li>Tabla <code>task_activity</code> para auditoría</li>
+                        <li>Tabla <code>subtasks</code> para subtareas</li>
+                        <li>Tabla <code>task_tags</code> para etiquetas</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Paso 3: Probar Board View -->
+            <div class="section">
+                <h2>🎯 Paso 3: Probar Board View</h2>
+                
+                <div class="step">
+                    <h3>3.1 Abrir Board</h3>
+                    <p>Accede a la vista Kanban:</p>
+                    <div class="url">
+                        https://grey-squirrel-133805.hostingersite.com/admin/board-view.html
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>3.2 Funcionalidades a Probar</h3>
+                    <div class="file-list">
+                        <ul>
+                            <li>✅ Ver 4 columnas con tareas</li>
+                            <li>✅ Arrastrar tareas entre columnas</li>
+                            <li>✅ Crear nueva tarea (➕ botón)</li>
+                            <li>✅ Editar tarea (click en tarjeta)</li>
+                            <li>✅ Eliminar tarea (🗑️ botón)</li>
+                            <li>✅ Buscar tareas (Ctrl+K)</li>
+                            <li>✅ Ver notificaciones toast</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 4: Verificar API -->
+            <div class="section">
+                <h2>🔌 Paso 4: Verificar API</h2>
+                
+                <div class="step">
+                    <h3>4.1 Probar Endpoints</h3>
+                    <p>Abre en el navegador para verificar:</p>
+                    <div class="url">
+                        https://grey-squirrel-133805.hostingersite.com/api/tasks.php?action=by-status
+                    </div>
+                    <p style="margin-top: 0.5rem;">Deberías ver un JSON con las tareas agrupadas por estado.</p>
+                </div>
+
+                <div class="step">
+                    <h3>4.2 Revisar Consola del Navegador</h3>
+                    <p>Presiona F12 en el Board View y verifica:</p>
+                    <div class="file-list">
+                        <ul>
+                            <li>✅ No debe haber errores en rojo</li>
+                            <li>✅ Debe cargar tareas correctamente</li>
+                            <li>✅ Las operaciones CRUD deben funcionar</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Troubleshooting -->
+            <div class="section">
+                <h2>🔧 Solución de Problemas</h2>
+                
+                <div class="warning">
+                    <strong>❌ Error: "API no responde"</strong>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>Verifica que <code>api/tasks.php</code> existe</li>
+                        <li>Revisa permisos del archivo (644)</li>
+                        <li>Verifica <code>config/config.php</code> con credenciales correctas</li>
+                    </ul>
+                </div>
+
+                <div class="warning">
+                    <strong>❌ Error: "No carga el CSS"</strong>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>Verifica que <code>admin/board-styles.css</code> existe</li>
+                        <li>Limpia caché del navegador (Ctrl+Shift+R)</li>
+                        <li>Revisa la consola por errores 404</li>
+                    </ul>
+                </div>
+
+                <div class="warning">
+                    <strong>❌ Error: "No se guardan los cambios"</strong>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>Revisa que las tablas se crearon correctamente</li>
+                        <li>Verifica credenciales de base de datos</li>
+                        <li>Revisa logs de error de PHP en Hostinger</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Próximos Pasos -->
+            <div class="section">
+                <h2>🚀 Próximos Pasos</h2>
+                
+                <div class="success">
+                    <p><strong>Una vez que todo funcione:</strong></p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>1️⃣ Integrar WebSocket para tiempo real</li>
+                        <li>2️⃣ Agregar vista Calendario</li>
+                        <li>3️⃣ Sistema de comentarios en tareas</li>
+                        <li>4️⃣ Subtareas con checklist</li>
+                        <li>5️⃣ Filtros avanzados</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div style="text-align: center; margin-top: 2rem; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                <p style="margin-bottom: 1rem; font-weight: 600;">Accesos Rápidos:</p>
+                <a href="https://grey-squirrel-133805.hostingersite.com/install-tasks.html" class="btn-primary" target="_blank">
+                    🗄️ Instalar Base de Datos
+                </a>
+                <a href="https://grey-squirrel-133805.hostingersite.com/admin/board-view.html" class="btn-primary" target="_blank">
+                    📋 Abrir Board View
+                </a>
+                <a href="https://grey-squirrel-133805.hostingersite.com/api/tasks.php?action=by-status" class="btn-primary" target="_blank">
+                    🔌 Probar API
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
